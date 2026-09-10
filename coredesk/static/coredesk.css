@@ -1,0 +1,143 @@
+/* CoreDesk 4.2 stylesheet.
+   Deliberately plain: small system font, square borders, no rounded corners,
+   no shadows, no animation. Layout is done with tables in the markup; CSS
+   here only handles color, borders, spacing and typography. */
+
+body {
+  font-family: Verdana, Tahoma, Geneva, sans-serif;
+  font-size: 12px;
+  color: #000000;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+td, th, input, button, a, p, label, h1 {
+  font-family: Verdana, Tahoma, Geneva, sans-serif;
+  font-size: 12px;
+}
+
+/* Outer page frame */
+table.page {
+  border: 0;
+}
+
+/* Top band: institution / product / date */
+table.topband {
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+table.topband td {
+  color: #ffffff;
+}
+table.topband .inst {
+  font-size: 15px;
+  font-weight: bold;
+}
+table.topband .prod {
+  font-size: 12px;
+}
+
+/* Second band: signed-on user */
+table.userband {
+  background-color: #e4e4e4;
+  border-top: 1px solid #b0b0b0;
+  border-bottom: 1px solid #b0b0b0;
+}
+table.userband a {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+/* Content area */
+table.content {
+  background-color: #ffffff;
+}
+
+/* Footer band */
+table.footer {
+  background-color: #dcdcdc;
+  border-top: 1px solid #b0b0b0;
+  color: #444444;
+  font-size: 11px;
+}
+table.footer td {
+  font-size: 11px;
+  color: #444444;
+}
+
+/* Headings */
+h1 {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+
+/* Error text */
+.error {
+  color: #cc0000;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+
+/* Data grids */
+table.grid {
+  border: 1px solid #000000;
+  border-collapse: collapse;
+}
+table.grid th {
+  background-color: var(--accent-color);
+  color: #ffffff;
+  text-align: left;
+  border: 1px solid #000000;
+  padding: 4px 10px;
+}
+table.grid td {
+  border: 1px solid #000000;
+  padding: 4px 10px;
+  background-color: #ffffff;
+}
+
+/* Currency columns are right-aligned (used by later screens) */
+table.grid td.currency,
+td.currency {
+  text-align: right;
+}
+
+/* Form layout tables */
+table.formtbl {
+  border-collapse: collapse;
+}
+table.formtbl td {
+  padding: 4px 8px;
+}
+
+/* Inputs and buttons: flat, square, 2006-era */
+input[type="text"],
+input[type="password"] {
+  border: 1px solid #7f7f7f;
+  background-color: #ffffff;
+  padding: 2px 3px;
+}
+button {
+  border: 1px solid #7f7f7f;
+  background-color: #ececec;
+  color: #000000;
+  padding: 2px 12px;
+}
+
+/* Links */
+a {
+  color: var(--accent-color);
+}
+a:visited {
+  color: var(--accent-color);
+}
+
+/* Non-OPEN share rows (FROZEN, CLOSED) render muted so they don't read as
+   available accounts. */
+tr.share-nonopen td {
+  color: #777777;
+  font-style: italic;
+}

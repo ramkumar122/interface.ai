@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Member Record {{ member_no }} - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">MEMBER RECORD</h1>
+
+{% if banner %}
+<p class="error" id="ctl00_MainContent_lblStatusBanner">{{ banner }}</p>
+{% endif %}
+
+<table id="ctl00_MainContent_tblMember" class="formtbl" cellpadding="4" cellspacing="0" border="1">
+  <tr>
+    <td align="right"><b>{{ cfg.label_member_no }}</b></td>
+    <td align="left">{{ m.member_no }}</td>
+  </tr>
+  <tr>
+    <td align="right"><b>Name</b></td>
+    <td align="left">{{ m.name }}</td>
+  </tr>
+  <tr>
+    <td align="right"><b>Status</b></td>
+    <td align="left">{{ m.status }}</td>
+  </tr>
+  <tr>
+    <td align="right"><b>Joined</b></td>
+    <td align="left">{{ m.joined }}</td>
+  </tr>
+  <tr>
+    <td align="right"><b>Branch</b></td>
+    <td align="left">{{ m.branch }}</td>
+  </tr>
+  <tr>
+    <td align="right"><b>Phone</b></td>
+    <td align="left">{{ m.phone }}</td>
+  </tr>
+</table>
+
+<p id="ctl00_MainContent_navStrip">
+  <a id="ctl00_MainContent_lnkShares" href="#shares-panel">Shares</a>
+  &nbsp;|&nbsp;
+  <a id="ctl00_MainContent_lnkCards" href="/member/{{ member_no }}/cards">Cards</a>
+  &nbsp;|&nbsp;
+  <a id="ctl00_MainContent_lnkAddress" href="/member/{{ member_no }}/address">Address</a>
+  &nbsp;|&nbsp;
+  <a id="ctl00_MainContent_lnkTransactions" href="/member/{{ member_no }}/transactions">Transactions</a>
+  &nbsp;|&nbsp;
+  <a id="ctl00_MainContent_lnkReturnInquiry" href="/mbrinq">Return to Inquiry</a>
+</p>
+
+<iframe id="shares-panel"
+        title="Share accounts for member {{ member_no }}"
+        src="/member/{{ member_no }}/shares"
+        width="100%" height="220"
+        style="border: 1px solid #b0b0b0;"></iframe>
+{% endblock %}

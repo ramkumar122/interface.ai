@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>{% block title %}{{ cfg.product_banner }} - {{ cfg.institution_name }}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="/static/coredesk.css">
+</head>
+<body style="--accent-color: {{ cfg.accent_color }};">
+  <table id="ctl00_tblPage" class="page" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>
+
+        <!-- Top band: institution / product / date -->
+        <table id="ctl00_tblHeader" class="topband" width="100%" cellpadding="6" cellspacing="0" border="0">
+          <tr>
+            <td class="inst" align="left" valign="middle">{{ cfg.institution_name }}</td>
+            <td class="prod" align="right" valign="middle">{{ cfg.product_banner }}&nbsp;&nbsp;&nbsp;{{ today }}</td>
+          </tr>
+        </table>
+
+        <!-- Second band: signed-on user (only when a session exists) -->
+        {% if sess %}
+        <table id="ctl00_tblUser" class="userband" width="100%" cellpadding="4" cellspacing="0" border="0">
+          <tr>
+            <td align="left" valign="middle">
+              User:&nbsp;<b>{{ sess.display_name }}</b>&nbsp;&nbsp;|&nbsp;&nbsp;Role:&nbsp;{{ sess.role }}&nbsp;&nbsp;|&nbsp;&nbsp;Branch:&nbsp;{{ sess.branch }}
+            </td>
+            <td align="right" valign="middle">
+              <a id="ctl00_lnkSignOff" href="/signoff">Sign Off</a>
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        <!-- Content -->
+        <table id="ctl00_tblContent" class="content" width="100%" cellpadding="10" cellspacing="0" border="0">
+          <tr>
+            <td valign="top">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+        </table>
+
+        <!-- Footer band: fake build string -->
+        <table id="ctl00_tblFooter" class="footer" width="100%" cellpadding="6" cellspacing="0" border="0">
+          <tr>
+            <td align="left" valign="middle">CoreDesk 4.2.117&nbsp;&nbsp;(c) 2006-2024 Meridian Core Systems</td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">MAIN MENU</h1>
+
+{% if err %}
+<p class="error" id="ctl00_MainContent_lblError">Invalid function code. Please try again.</p>
+{% endif %}
+
+<table id="ctl00_MainContent_grdMenu" class="grid" cellpadding="4" cellspacing="0" border="1">
+  <tr>
+    <th scope="col">CODE</th>
+    <th scope="col">FUNCTION</th>
+  </tr>
+  {% for item in menu_items %}
+  <tr>
+    <td>
+      <a id="ctl00_MainContent_grdMenu_ctl{{ '%02d' % (loop.index + 1) }}_lnkCode" href="{{ item.route }}">{{ item.code }}</a>
+    </td>
+    <td>{{ item.description }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<br>
+
+<form id="ctl00_frmFastPath" method="post" action="/menu">
+  <table id="ctl00_MainContent_tblFastPath" class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td align="right">
+        <label for="ctl00_MainContent_txtFnCode">Function Code</label>
+      </td>
+      <td align="left">
+        <input type="text" name="fncode" id="ctl00_MainContent_txtFnCode" size="12" maxlength="12">
+      </td>
+      <td align="left">
+        <button type="submit" id="ctl00_MainContent_btnGo">Go</button>
+      </td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

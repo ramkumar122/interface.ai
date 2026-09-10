@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">CORE SIGN ON</h1>
+
+{% if err %}
+<p class="error" id="ctl00_MainContent_lblError">Invalid user ID or password.</p>
+{% endif %}
+
+<form id="ctl00_frmSignOn" method="post" action="/signon">
+  <input type="hidden" name="__CANARY" id="ctl00_MainContent_hdnCanary" value="CANARY-A7F3-DONOTLOG">
+  <table id="ctl00_MainContent_tblSignOn" class="formtbl" cellpadding="6" cellspacing="0" border="1">
+    <tr>
+      <td align="right">
+        <label for="ctl00_MainContent_txtUserId">User ID</label>
+      </td>
+      <td align="left">
+        <input type="text" name="userid" id="ctl00_MainContent_txtUserId" size="24" maxlength="32">
+      </td>
+    </tr>
+    <tr>
+      <td align="right">
+        <label for="ctl00_MainContent_txtPassword">Password</label>
+      </td>
+      <td align="left">
+        <input type="password" name="password" id="ctl00_MainContent_txtPassword" size="24" maxlength="32">
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <button type="submit" id="ctl00_MainContent_btnSignOn">Sign On</button>
+      </td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

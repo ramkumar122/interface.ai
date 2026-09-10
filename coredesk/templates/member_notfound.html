@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Member Not Found - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">MEMBER RECORD</h1>
+
+<table id="ctl00_MainContent_tblNotFound" class="formtbl" cellpadding="6" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <p class="error" id="ctl00_MainContent_lblNotFound">Member record not found.</p>
+      <p><a id="ctl00_MainContent_lnkReturnInquiry" href="/mbrinq">Return to Inquiry</a></p>
+    </td>
+  </tr>
+</table>
+{% endblock %}

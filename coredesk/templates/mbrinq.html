@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Member Inquiry - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">{{ heading }}</h1>
+
+{% if error %}
+<p class="error" id="ctl00_MainContent_lblError">{{ error }}</p>
+{% endif %}
+
+<p id="ctl00_MainContent_lblInstr">Enter a member number or last name and press Search.</p>
+
+<form id="ctl00_frmInquiry" method="get" action="/mbrinq/results">
+  {% if fn %}
+  <input type="hidden" name="fn" id="ctl00_MainContent_hdnFn" value="{{ fn }}">
+  {% endif %}
+  <table id="ctl00_MainContent_tblCriteria" class="formtbl" cellpadding="6" cellspacing="0" border="1">
+    <tr>
+      <td align="right">
+        <label for="ctl00_MainContent_txtMemberNo">{{ cfg.label_member_no }}</label>
+      </td>
+      <td align="left">
+        <input type="text" name="member_no" id="ctl00_MainContent_txtMemberNo" size="16" maxlength="10" value="{{ member_no }}">
+      </td>
+    </tr>
+    <tr>
+      <td align="right">
+        <label for="ctl00_MainContent_txtLastName">Last Name</label>
+      </td>
+      <td align="left">
+        <input type="text" name="last_name" id="ctl00_MainContent_txtLastName" size="28" maxlength="40" value="{{ last_name }}">
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <button type="submit" id="ctl00_MainContent_btnSearch">Search</button>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<p><a id="ctl00_MainContent_lnkReturnMenu" href="/menu">Return to Menu</a></p>
+{% endblock %}

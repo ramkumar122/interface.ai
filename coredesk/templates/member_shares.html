@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Share Accounts - {{ cfg.institution_name }}</title>
+  <link rel="stylesheet" type="text/css" href="/static/coredesk.css">
+</head>
+<body style="--accent-color: {{ cfg.accent_color }};">
+  <h1 id="ctl00_MainContent_hdrShares">{{ cfg.label_shares }}</h1>
+
+  {% if not_found %}
+  <p class="error" id="ctl00_MainContent_lblNotFound">Member record not found.</p>
+  {% elif rows %}
+  <table id="ctl00_MainContent_grdShares" class="grid" cellpadding="4" cellspacing="0" border="1">
+    <caption>Share accounts</caption>
+    <tr>
+      {% for col in cfg.shares_columns %}
+      <th scope="col">{{ col.header }}</th>
+      {% endfor %}
+    </tr>
+    {% for row in rows %}
+    <tr{% if not row.is_open %} class="share-nonopen"{% endif %}>
+      {% for col in cfg.shares_columns %}
+      <td{% if col.money %} align="right"{% endif %}>{{ row[col.field] }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p id="ctl00_MainContent_lblNoShares">No share accounts on file.</p>
+  {% endif %}
+</body>
+</html>

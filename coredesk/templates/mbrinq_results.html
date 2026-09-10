@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Member Inquiry Results - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">MEMBER INQUIRY - RESULTS</h1>
+
+<p id="ctl00_MainContent_lblCount">{{ count }} record(s) found.</p>
+
+<table id="ctl00_MainContent_grdMembers" class="grid" cellpadding="4" cellspacing="0" border="1">
+  <caption>Member search results</caption>
+  <tr>
+    {% for col in cfg.results_columns %}
+    <th scope="col">{{ col.header }}</th>
+    {% endfor %}
+    <th scope="col"></th>
+  </tr>
+  {% if rows %}
+  {% for row in rows %}
+  <tr>
+    {% for col in cfg.results_columns %}
+    <td>{{ row[col.field] }}</td>
+    {% endfor %}
+    <td>
+      <a id="ctl00_MainContent_grdMembers_ctl{{ '%02d' % (loop.index + 1) }}_lnkSel" href="{{ row.action_href }}">{{ cfg.link_select }}</a>
+    </td>
+  </tr>
+  {% endfor %}
+  {% else %}
+  <tr>
+    <td colspan="{{ cfg.results_columns|length + 1 }}">No records found for the specified criteria.</td>
+  </tr>
+  {% endif %}
+</table>
+
+<p><a id="ctl00_MainContent_lnkReturnInquiry" href="{{ inquiry_href }}">Return to Inquiry</a></p>
+{% endblock %}
