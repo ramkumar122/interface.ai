@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}New Share Account - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">OPEN SHARE ACCOUNT</h1>
+
+{% if blocked %}
+<p class="error" id="ctl00_MainContent_lblBlocked">{{ blocked }}</p>
+<p><a id="ctl00_MainContent_lnkReturnRecord" href="/member/{{ member_no }}">Return to Member Record</a></p>
+{% else %}
+
+{% if info %}<p class="notice" id="ctl00_MainContent_lblInfo">{{ info }}</p>{% endif %}
+{% if error %}<p class="error" id="ctl00_MainContent_lblError">{{ error }}</p>{% endif %}
+
+<form id="ctl00_MainContent_frmShareNew" method="post" action="/member/{{ member_no }}/shares/new">
+  <table class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_selShareType">Share Type</label></td>
+      <td align="left">
+        <select name="share_type" id="ctl00_MainContent_selShareType">
+          <option value="">-- select --</option>
+          {% for value, label in share_types %}
+          <option value="{{ value }}"{% if vals.share_type == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtDescription">Description</label></td>
+      <td align="left">
+        <input type="text" name="description" id="ctl00_MainContent_txtDescription" size="28" maxlength="40" value="{{ vals.description }}">
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtDeposit">Initial Deposit Amount</label></td>
+      <td align="left">
+        <input type="text" name="deposit" id="ctl00_MainContent_txtDeposit" size="16" maxlength="16" value="{{ vals.deposit }}">
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_selFunding">Funding Share</label></td>
+      <td align="left">
+        <select name="funding_share_id" id="ctl00_MainContent_selFunding">
+          <option value="">-- select --</option>
+          {% for f in funding %}
+          <option value="{{ f.share_id }}"{% if vals.funding_share_id == f.share_id %} selected{% endif %}>{{ f.label }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <button type="submit" id="ctl00_MainContent_btnContinueReview">Continue to Review</button>
+        &nbsp;
+        <a id="ctl00_MainContent_lnkCancel" href="/member/{{ member_no }}">Cancel</a>
+      </td>
+    </tr>
+  </table>
+</form>
+{% endif %}
+{% endblock %}

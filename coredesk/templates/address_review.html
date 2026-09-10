@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Address Change Review - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">ADDRESS CHANGE - REVIEW</h1>
+
+{% if blocked %}
+<p class="error" id="ctl00_MainContent_lblBlocked">{{ blocked }}</p>
+<p><a id="ctl00_MainContent_lnkReturnRecord" href="/member/{{ member_no }}">Return to Member Record</a></p>
+{% elif not pending %}
+<p class="notice" id="ctl00_MainContent_lblNoPending">No pending address change. Return to the address form.</p>
+<p><a id="ctl00_MainContent_lnkReturnForm" href="/member/{{ member_no }}/address">Return to the address form</a></p>
+{% else %}
+<table id="ctl00_MainContent_grdReview" class="grid" cellpadding="4" cellspacing="0" border="1">
+  <caption>Address change review</caption>
+  <tr>
+    <th scope="col">FIELD</th>
+    <th scope="col">CURRENT</th>
+    <th scope="col">NEW</th>
+  </tr>
+  {% for field, cur, new_val in rows %}
+  <tr>
+    <td>{{ field }}</td>
+    <td>{{ cur }}</td>
+    <td>{{ new_val }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<br>
+
+<form id="ctl00_MainContent_frmCommit" method="post" action="/member/{{ member_no }}/address/commit">
+  <input type="hidden" name="line1" value="{{ new.line1 }}">
+  <input type="hidden" name="line2" value="{{ new.line2 }}">
+  <input type="hidden" name="city" value="{{ new.city }}">
+  <input type="hidden" name="state" value="{{ new.state }}">
+  <input type="hidden" name="zip" value="{{ new.zip }}">
+  <input type="hidden" name="eff" value="{{ new.eff }}">
+  <button type="submit" id="ctl00_MainContent_btnConfirm">Confirm Update</button>
+  &nbsp;
+  <a id="ctl00_MainContent_lnkBackToEdit" href="/member/{{ member_no }}/address">Back to Edit</a>
+</form>
+{% endif %}
+{% endblock %}

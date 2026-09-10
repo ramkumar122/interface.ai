@@ -348,7 +348,11 @@ def set_card_status(card_id, new_status, reason, notes, staff_username, actor):
             "UPDATE card SET status = ? WHERE card_id = ?", (new_status, card_id)
         )
         reference = _make_reference("CRD")
-        detail = "; ".join(p for p in (reason, notes) if p)
+        # Redact before writing: store the controlled reason, and only a marker
+        # that a free-text note was present -- never the note text itself.
+        detail = "reason=%s" % (reason or "")
+        if notes:
+            detail += "; note=Y"
         _insert_audit(
             conn,
             staff_username=staff_username,
@@ -419,6 +423,20 @@ def get_share_request(request_id):
             "SELECT * FROM share_request WHERE request_id = ?", (request_id,)
         ).fetchone()
         return _to(ShareRequestRow, row)
+    finally:
+        conn.close()
+
+
+def cancel_share_request(request_id):
+    """Mark a DRAFT share request CANCELLED. No audit row (nothing was created)."""
+    conn = get_connection()
+    try:
+        conn.execute(
+            "UPDATE share_request SET status = 'CANCELLED' "
+            "WHERE request_id = ? AND status = 'DRAFT'",
+            (request_id,),
+        )
+        conn.commit()
     finally:
         conn.close()
 

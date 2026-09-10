@@ -42,6 +42,13 @@ CONFIG = {
             {"header": "LEDGER", "field": "ledger", "money": True},
             {"header": "STATUS", "field": "status"},
         ],
+        "cards_columns": [
+            {"header": "CARD", "field": "card_id"},
+            {"header": "NETWORK", "field": "network"},
+            {"header": "LAST 4", "field": "last4"},
+            {"header": "STATUS", "field": "status"},
+            {"header": "LINKED", "field": "linked"},
+        ],
     },
     "summit": {
         "port": 8002,
@@ -67,6 +74,13 @@ CONFIG = {
             {"header": "AVAIL BAL", "field": "available", "money": True},
             {"header": "LEDGER BAL", "field": "ledger", "money": True},
             {"header": "STATUS", "field": "status"},
+        ],
+        "cards_columns": [
+            {"header": "CARD", "field": "card_id"},
+            {"header": "NETWORK", "field": "network"},
+            {"header": "LAST 4", "field": "last4"},
+            {"header": "STATUS", "field": "status"},
+            {"header": "LINKED", "field": "linked"},
         ],
     },
 }
@@ -149,3 +163,14 @@ def fn_function(token):
         if fn["fn"] == token:
             return fn
     return None
+
+
+# US state/territory two-letter codes for the address form's State <select>.
+# Not tenant-specific.
+STATE_CODES = [
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
+    "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+    "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
+    "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
+    "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+]

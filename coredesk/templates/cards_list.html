@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Card Maintenance - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">CARD MAINTENANCE</h1>
+
+<p id="ctl00_MainContent_lblMember">Member {{ member_no }} &nbsp;&mdash;&nbsp; {{ member_name }}</p>
+
+{% if blocked %}
+<p class="error" id="ctl00_MainContent_lblBlocked">{{ blocked }}</p>
+{% else %}
+<table id="ctl00_MainContent_grdCards" class="grid" cellpadding="4" cellspacing="0" border="1">
+  <caption>Cards on file</caption>
+  <tr>
+    {% for col in cfg.cards_columns %}
+    <th scope="col">{{ col.header }}</th>
+    {% endfor %}
+    <th scope="col"></th>
+  </tr>
+  {% if rows %}
+  {% for row in rows %}
+  <tr>
+    {% for col in cfg.cards_columns %}
+    <td>{{ row[col.field] }}</td>
+    {% endfor %}
+    <td>
+      <a id="ctl00_MainContent_grdCards_ctl{{ '%02d' % (loop.index + 1) }}_lnkMaint" href="{{ row.maint_href }}">MAINT</a>
+    </td>
+  </tr>
+  {% endfor %}
+  {% else %}
+  <tr>
+    <td colspan="{{ cfg.cards_columns|length + 1 }}">No cards on file for this member.</td>
+  </tr>
+  {% endif %}
+</table>
+{% endif %}
+
+<p id="ctl00_MainContent_navStrip">
+  <a id="ctl00_MainContent_lnkReturnRecord" href="/member/{{ member_no }}">Return to Member Record</a>
+  &nbsp;|&nbsp;
+  <a id="ctl00_MainContent_lnkReturnInquiry" href="/mbrinq">Return to Inquiry</a>
+</p>
+{% endblock %}

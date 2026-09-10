@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Inject Runtime Condition - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">RUNTIME CONDITION INJECTION</h1>
+
+<p class="notice" id="ctl00_MainContent_lblState">
+  Active: {{ state.name or "(none)" }}
+  {% if state.name %}&nbsp;(remaining: {{ state.remaining }}){% endif %}
+</p>
+
+<form id="ctl00_MainContent_frmInject" method="post" action="/admin/inject">
+  <table class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    {% for c in conditions %}
+    <tr>
+      <td>
+        <input type="radio" name="name" value="{{ c }}" id="ctl00_MainContent_rdo_{{ c }}"{% if loop.first %} checked{% endif %}>
+        <label for="ctl00_MainContent_rdo_{{ c }}">{{ c }}</label>
+      </td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td>
+        <label for="ctl00_MainContent_txtCount">Apply to next N requests</label>
+        <input type="text" name="count" id="ctl00_MainContent_txtCount" size="4" maxlength="3" value="1">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <button type="submit" name="op" value="apply" id="ctl00_MainContent_btnApply">Apply</button>
+        &nbsp;
+        <button type="submit" name="op" value="clear" id="ctl00_MainContent_btnClear">Clear</button>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<p><a id="ctl00_MainContent_lnkMenu" href="/menu">Return to Menu</a></p>
+{% endblock %}

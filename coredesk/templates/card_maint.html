@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Card Maintenance{% if card %} {{ card.card_id }}{% endif %} - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">CARD MAINTENANCE</h1>
+
+{% if blocked %}
+<p class="error" id="ctl00_MainContent_lblBlocked">{{ blocked }}</p>
+<p><a id="ctl00_MainContent_lnkReturnRecord" href="/member/{{ member_no }}">Return to Member Record</a></p>
+{% elif card is none %}
+<p class="error" id="ctl00_MainContent_lblNotFound">Card not found.</p>
+<p><a id="ctl00_MainContent_lnkReturnCards" href="/member/{{ member_no }}/cards">Return to Cards</a></p>
+{% else %}
+
+{% if banner %}
+<p class="confirm" id="ctl00_MainContent_lblBanner">{{ banner }}</p>
+{% endif %}
+{% if error %}
+<p class="error" id="ctl00_MainContent_lblError">{{ error }}</p>
+{% endif %}
+{% if info %}
+<p class="notice" id="ctl00_MainContent_lblInfo">{{ info }}</p>
+{% endif %}
+
+<table id="ctl00_MainContent_tblCard" class="formtbl" cellpadding="4" cellspacing="0" border="1">
+  <tr><td align="right"><b>Card</b></td><td align="left">{{ card.card_id }}</td></tr>
+  <tr><td align="right"><b>Network</b></td><td align="left">{{ card.network }}</td></tr>
+  <tr><td align="right"><b>Last 4</b></td><td align="left">{{ card.last4 }}</td></tr>
+  <tr><td align="right"><b>Status</b></td><td align="left">{{ card.status }}</td></tr>
+  <tr><td align="right"><b>Linked</b></td><td align="left">{{ card.linked }}</td></tr>
+  <tr><td align="right"><b>Issued</b></td><td align="left">{{ card.issued }}</td></tr>
+</table>
+
+<br>
+
+<form id="ctl00_MainContent_frmMaint" method="post"
+      action="/member/{{ member_no }}/cards/{{ card.card_id }}/maint"
+      onsubmit="var a=this.querySelector('input[name=action]:checked'); return !(a &amp;&amp; a.value=='HOTLIST') || confirm('Report this card lost or stolen? This cannot be undone.');">
+  <fieldset id="ctl00_MainContent_fsAction">
+    <legend>Action</legend>
+    <table class="formtbl" cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <input type="radio" name="action" value="LOCK" id="ctl00_MainContent_rdoLock"{% if sel_action == 'LOCK' %} checked{% endif %}>
+          <label for="ctl00_MainContent_rdoLock">Lock</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="action" value="UNLOCK" id="ctl00_MainContent_rdoUnlock"{% if sel_action == 'UNLOCK' %} checked{% endif %}>
+          <label for="ctl00_MainContent_rdoUnlock">Unlock</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="action" value="HOTLIST" id="ctl00_MainContent_rdoHotlist"{% if sel_action == 'HOTLIST' %} checked{% endif %}>
+          <label for="ctl00_MainContent_rdoHotlist">Report Lost or Stolen</label>
+        </td>
+      </tr>
+    </table>
+  </fieldset>
+
+  <table class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_selReason">Reason</label></td>
+      <td align="left">
+        <select name="reason" id="ctl00_MainContent_selReason">
+          <option value="">-- select --</option>
+          <option value="Member request">Member request</option>
+          <option value="Suspected fraud">Suspected fraud</option>
+          <option value="Card misplaced">Card misplaced</option>
+          <option value="Other">Other</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td align="right" valign="top"><label for="ctl00_MainContent_txtNotes">Notes</label></td>
+      <td align="left">
+        <textarea name="notes" id="ctl00_MainContent_txtNotes" rows="3" cols="40" maxlength="200">{{ sel_notes|default('', true) }}</textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <button type="submit" id="ctl00_MainContent_btnApply">Apply</button>
+        &nbsp;
+        <a id="ctl00_MainContent_lnkCancel" href="/member/{{ member_no }}/cards">Cancel</a>
+      </td>
+    </tr>
+  </table>
+</form>
+{% endif %}
+{% endblock %}

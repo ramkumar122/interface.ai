@@ -141,3 +141,15 @@ tr.share-nonopen td {
   color: #777777;
   font-style: italic;
 }
+
+/* Write-path banners: green confirmation, plain-bold notice (no-change/refusal). */
+.confirm {
+  color: #1a7f37;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+.notice {
+  color: #333333;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}

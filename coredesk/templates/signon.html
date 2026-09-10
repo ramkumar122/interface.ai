@@ -5,6 +5,9 @@
 {% if err %}
 <p class="error" id="ctl00_MainContent_lblError">Invalid user ID or password.</p>
 {% endif %}
+{% if expired %}
+<p class="notice" id="ctl00_MainContent_lblExpired">Your session has expired.</p>
+{% endif %}
 
 <form id="ctl00_frmSignOn" method="post" action="/signon">
   <input type="hidden" name="__CANARY" id="ctl00_MainContent_hdnCanary" value="CANARY-A7F3-DONOTLOG">

@@ -152,7 +152,7 @@ def test_set_card_status_locks_and_audits():
 # ---------------------------------------------------------------------------
 def test_list_transactions_for_checking():
     txns = queries.list_transactions("SHR-100101-0070", None, None)
-    assert len(txns) == 10
+    assert len(txns) == 12
     # ordered ascending by posted_on
     dates = [t.posted_on for t in txns]
     assert dates == sorted(dates)

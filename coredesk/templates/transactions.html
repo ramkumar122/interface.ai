@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Transaction History - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">TRANSACTION HISTORY</h1>
+
+<form id="ctl00_MainContent_frmTxn" method="get" action="/member/{{ member_no }}/transactions">
+  <table class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_selShare">Share</label></td>
+      <td align="left">
+        <select name="share" id="ctl00_MainContent_selShare">
+          {% for s in shares %}
+          <option value="{{ s.share_id }}"{% if sel_share == s.share_id %} selected{% endif %}>{{ s.label }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtFrom">From</label></td>
+      <td align="left"><input type="text" name="from" id="ctl00_MainContent_txtFrom" size="12" maxlength="10" value="{{ from_str }}"></td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtTo">To</label></td>
+      <td align="left"><input type="text" name="to" id="ctl00_MainContent_txtTo" size="12" maxlength="10" value="{{ to_str }}"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right"><button type="submit" id="ctl00_MainContent_btnSearch">Search</button></td>
+    </tr>
+  </table>
+</form>
+
+{% if error %}
+<p class="error" id="ctl00_MainContent_lblError">{{ error }}</p>
+{% else %}
+<table id="ctl00_MainContent_grdTxn" class="grid" cellpadding="4" cellspacing="0" border="1">
+  <caption>Transaction history</caption>
+  <tr>
+    <th scope="col">DATE</th>
+    <th scope="col">DESCRIPTION</th>
+    <th scope="col">TYPE</th>
+    <th scope="col">AMOUNT</th>
+  </tr>
+  {% if rows %}
+  {% for row in rows %}
+  <tr>
+    <td>{{ row.date }}</td>
+    <td>{{ row.description }}</td>
+    <td>{{ row.type }}</td>
+    <td align="right">{{ row.amount }}</td>
+  </tr>
+  {% endfor %}
+  {% else %}
+  <tr>
+    <td colspan="4">No transactions found for the selected period.</td>
+  </tr>
+  {% endif %}
+</table>
+
+<p id="ctl00_MainContent_pgNav">
+  {% if prev_href %}<a id="ctl00_MainContent_lnkPrev" href="{{ prev_href }}">Previous</a>{% endif %}
+  {% if prev_href and next_href %}&nbsp;|&nbsp;{% endif %}
+  {% if next_href %}<a id="ctl00_MainContent_lnkNext" href="{{ next_href }}">Next</a>{% endif %}
+</p>
+{% endif %}
+{% endblock %}

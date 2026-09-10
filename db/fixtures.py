@@ -390,6 +390,10 @@ TXNS = [
      "description": "POS PURCHASE - CORNER MARKET", "amount": "-61.40", "txn_type": "POS"},
     {"txn_id": "TXN-00010", "share_id": "SHR-100101-0070", "posted_on": "2026-08-20",
      "description": "TRANSFER TO SAVINGS", "amount": "-300.00", "txn_type": "TRANSFER"},
+    {"txn_id": "TXN-00016", "share_id": "SHR-100101-0070", "posted_on": "2026-08-28",
+     "description": "POS PURCHASE - PHARMACY", "amount": "-31.15", "txn_type": "POS"},
+    {"txn_id": "TXN-00017", "share_id": "SHR-100101-0070", "posted_on": "2026-09-02",
+     "description": "ACH DEPOSIT - PAYROLL", "amount": "2,450.00", "txn_type": "ACH"},
 
     # --- 100110 savings (SHR-100110-0000): 5 rows ---
     {"txn_id": "TXN-00011", "share_id": "SHR-100110-0000", "posted_on": "2026-06-20",

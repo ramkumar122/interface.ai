@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Address Change - {{ cfg.institution_name }}{% endblock %}
+{% block content %}
+<h1 id="ctl00_MainContent_hdrTitle">ADDRESS CHANGE</h1>
+
+{% if blocked %}
+<p class="error" id="ctl00_MainContent_lblBlocked">{{ blocked }}</p>
+<p><a id="ctl00_MainContent_lnkReturnRecord" href="/member/{{ member_no }}">Return to Member Record</a></p>
+{% else %}
+
+{% if banner %}<p class="confirm" id="ctl00_MainContent_lblBanner">{{ banner }}</p>{% endif %}
+{% if info %}<p class="notice" id="ctl00_MainContent_lblInfo">{{ info }}</p>{% endif %}
+
+<p id="ctl00_MainContent_lblCurrentHdr"><b>Current address</b></p>
+<table id="ctl00_MainContent_tblCurrent" class="formtbl" cellpadding="4" cellspacing="0" border="1">
+  <tr><td align="right"><b>Address Line 1</b></td><td align="left">{{ current.line1 }}</td></tr>
+  <tr><td align="right"><b>Address Line 2</b></td><td align="left">{{ current.line2 }}</td></tr>
+  <tr><td align="right"><b>City</b></td><td align="left">{{ current.city }}</td></tr>
+  <tr><td align="right"><b>State</b></td><td align="left">{{ current.state }}</td></tr>
+  <tr><td align="right"><b>ZIP Code</b></td><td align="left">{{ current.zip }}</td></tr>
+</table>
+
+<br>
+
+<form id="ctl00_MainContent_frmAddress" method="post" action="/member/{{ member_no }}/address">
+  <table class="formtbl" cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtLine1">Address Line 1</label></td>
+      <td align="left">
+        <input type="text" name="line1" id="ctl00_MainContent_txtLine1" size="36" maxlength="60" value="{{ vals.line1 }}">
+        {% if errors.line1 %}<span class="error">{{ errors.line1 }}</span>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtLine2">Address Line 2</label></td>
+      <td align="left">
+        <input type="text" name="line2" id="ctl00_MainContent_txtLine2" size="36" maxlength="60" value="{{ vals.line2 }}">
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtCity">City</label></td>
+      <td align="left">
+        <input type="text" name="city" id="ctl00_MainContent_txtCity" size="28" maxlength="40" value="{{ vals.city }}">
+        {% if errors.city %}<span class="error">{{ errors.city }}</span>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_selState">State</label></td>
+      <td align="left">
+        <select name="state" id="ctl00_MainContent_selState">
+          <option value="">-- select --</option>
+          {% for code in states %}
+          <option value="{{ code }}"{% if vals.state == code %} selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.state %}<span class="error">{{ errors.state }}</span>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtZip">ZIP Code</label></td>
+      <td align="left">
+        <input type="text" name="zip" id="ctl00_MainContent_txtZip" size="12" maxlength="10" value="{{ vals.zip }}">
+        {% if errors.zip %}<span class="error">{{ errors.zip }}</span>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><label for="ctl00_MainContent_txtEff">Effective Date</label></td>
+      <td align="left">
+        <input type="text" name="eff" id="ctl00_MainContent_txtEff" size="12" maxlength="10" value="{{ vals.eff }}">
+        {% if errors.eff %}<span class="error">{{ errors.eff }}</span>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <button type="submit" id="ctl00_MainContent_btnContinue">{{ cfg.btn_continue }}</button>
+        &nbsp;
+        <a id="ctl00_MainContent_lnkCancel" href="/member/{{ member_no }}">Cancel</a>
+      </td>
+    </tr>
+  </table>
+</form>
+{% endif %}
+{% endblock %}
