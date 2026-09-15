@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% from "_turns.html" import turn_log %}
+{% set nav = 'discover' %}
+{% block title %}Discovering — Operator Console{% endblock %}
+{% block head %}
+{% if state.in_flight or state.pending_human %}<meta http-equiv="refresh" content="1">{% endif %}
+{% endblock %}
+{% block content %}
+<h1>Discovering</h1>
+<p class="lede">{{ ds.goal }}</p>
+<div style="margin-bottom:16px">
+  <span class="badge neutral">{{ ds.model }}</span>
+  <span class="badge neutral">{{ state.run_id }}</span>
+  <span class="badge neutral">step {{ view.last_ordinal }}</span>
+  <span class="badge neutral">{{ "{:,}".format(view.total_tokens) }} tokens</span>
+  <span class="badge neutral">{{ state.elapsed_s }}s</span>
+</div>
+
+{% if ds.verify_also %}
+<p class="small muted">
+  Verified against {{ ds.records_described }} — two records, because the same
+  values twice prove determinism and not portability.
+</p>
+{% endif %}
+
+{% if state.in_flight %}
+<div class="running">
+  <div class="pulse"></div>
+  <div>
+    <strong>The model is driving the browser.</strong>
+    <div class="small muted">
+      Turns appear as the loop writes them. There is no "step N of M" —
+      the budget is 25 and the model stops when the goal is met.
+    </div>
+  </div>
+</div>
+{% elif state.phase == 'paused' %}
+<div class="notice stop">
+  <strong>Paused — waiting for a person.</strong>
+  <span class="why">{{ ds.pause_reason or "the model could not proceed" }}</span>
+</div>
+<p class="small muted">
+  Look at the headed browser to see the page. Do <em>not</em> click in
+  it — those clicks are not recorded. Pick a control below; Run this
+  step goes through the same policy gate and writes a transcript line.
+  Hand off to model when the page is unstuck.
+</p>
+{% if ds.human_error %}
+<div class="notice warn">{{ ds.human_error }}</div>
+{% endif %}
+{% if state.pending_human %}
+<div class="running">
+  <div class="pulse"></div>
+  <div><strong>Running your step…</strong></div>
+</div>
+{% else %}
+<form method="post" action="/run/{{ state.run_id }}/human-step" class="human-step">
+  <div class="row-pair">
+    <label>Action
+      <select name="action" required>
+        <option value="click">click</option>
+        <option value="type">type</option>
+        <option value="select">select</option>
+        <option value="read">read</option>
+      </select>
+    </label>
+    <label>Control
+      <select name="ref" required>
+        {% for n in nodes %}
+        <option value="{{ n.ref }}">{{ n.role }} “{{ n.name }}” [{{ n.ref }}]</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  {% if ds.inputs %}
+  <label>For type: declared input
+    <select name="from_input">
+      <option value="">— literal below —</option>
+      {% for name in ds.inputs %}
+      <option value="{{ name }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% endif %}
+  <label>For type: literal text <input type="text" name="text" value=""></label>
+  <label>For select: option <input type="text" name="option" value=""></label>
+  {% if ds.outputs %}
+  <label>For read: output
+    <select name="into_output">
+      {% for name in ds.outputs %}
+      <option value="{{ name }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% endif %}
+  <div class="button-row">
+    <button type="submit">Run this step</button>
+  </div>
+</form>
+<form method="post" action="/run/{{ state.run_id }}/handoff" class="button-row">
+  <button type="submit" class="primary">Hand off to model</button>
+</form>
+{% endif %}
+{% endif %}
+
+{{ turn_log(view, running=state.in_flight) }}
+
+{% if ds.phases %}
+<h2>Gates</h2>
+<div class="pipeline">
+  {% for p in ds.phases %}
+  <div class="gate gate-{{ 'ok' if p.ok else 'no' }}">
+    <span class="gate-arrow">↓</span>
+    <span class="gate-name">{{ p.name }}</span>
+    {% if p.detail %}<span class="gate-detail">{{ p.detail }}</span>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not state.in_flight and state.phase != 'paused' %}
+  {% if ds.written %}
+  <div class="notice ok">
+    <strong>Written as DRAFT.</strong>
+    <code>{{ ds.artifact_path }}</code> — verified
+    {{ ds.verify_runs }}/{{ ds.verify_runs }}, outputs matched. It cannot run
+    unattended until a human approves it.
+  </div>
+  <div class="button-row">
+    <a href="/review/{{ ds.artifact_key }}"><button type="button">Review and approve →</button></a>
+  </div>
+  {% else %}
+  <div class="notice warn">
+    <strong>No artifact was written.</strong>
+    {{ ds.failure_reason }}
+    {% if state.error %}<span class="why">{{ state.error }}</span>{% endif %}
+  </div>
+  {% if ds.gate_refused %}
+  <p class="small muted">
+    This is a gate refusing, not a crash. A capability exists only once it
+    has replayed — the machine gate runs before the human one, and an
+    artifact that has not replayed would be refused by
+    <code>approve()</code> anyway.
+  </p>
+  {% endif %}
+  <ul class="plain">
+    <li><a href="/evidence/{{ state.run_id }}/transcript.jsonl">Transcript</a>
+      — every turn the model took</li>
+    <li><a href="/discover">Try another goal</a></li>
+  </ul>
+  {% endif %}
+{% endif %}
+{% endblock %}

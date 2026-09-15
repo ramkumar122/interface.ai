@@ -1,0 +1,57 @@
+{# Shared fragments. Kept in one file so a badge means the same thing on
+   every screen — a reviewer learns the vocabulary once. #}
+
+{% macro status_badge(status) %}
+<span class="badge {{ status }}">{{ status }}</span>
+{% endmacro %}
+
+{% macro risk_badge(risk) %}
+<span class="badge {{ risk }}">{{ risk }}</span>
+{% endmacro %}
+
+{% macro verified(runs) %}
+{% if runs is none %}
+<span class="muted small">no verified runs</span>
+{% else %}
+<span class="small">{{ runs }} verified run{{ '' if runs == 1 else 's' }}</span>
+{% endif %}
+{% endmacro %}
+
+{# Section 2 of the review screen, and the only place steps are rendered.
+   The clauses come from operator_console/describe.py already phrased; the
+   template only lays them out. #}
+{% macro step_list(steps) %}
+<div class="steps">
+  {% for s in steps %}
+  <div class="step">
+    <div class="step-head">
+      <span class="step-ord">{{ s.ordinal }}.</span>
+      <span class="step-intent">{{ s.intent }}</span>
+      {{ risk_badge(s.risk) }}
+    </div>
+    <div class="step-body">
+      {% for clause in s.locator_clauses %}
+      <div class="step-clause {% if not loop.first %}cont{% endif %}">
+        {% if loop.first %}<span class="arrow">&rarr;</span>{% endif %}{{ clause }}
+      </div>
+      {% endfor %}
+      {% if s.value_clause %}
+      <div class="step-clause"><span class="arrow">&rarr;</span>{{ s.value_clause|redact }}
+        {% if s.value_needs_review %}
+        {# The compiler's own flag: this value was frozen at discovery time
+           and every invocation will use it. #}
+        <span class="literal-flag">&#9888; literal — review this</span>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% for headline, reason in s.rejected %}
+      <div class="step-rejected">
+        <span class="mark">&#10005;</span>{{ headline }}
+        <span class="why">{{ reason }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}

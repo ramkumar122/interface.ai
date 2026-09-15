@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_turns.html" import turn_log %}
+{% set nav = 'discover' %}
+{% block title %}Recording {{ run_id }} — Operator Console{% endblock %}
+{% block head %}
+{% if not at_end %}<meta http-equiv="refresh" content="1; url=/discover/rehearse?run_id={{ run_id }}&step={{ step + 1 }}">{% endif %}
+{% endblock %}
+{% block content %}
+<div class="notice warn">
+  <strong>Replayed recording.</strong>
+  This is a saved transcript of run <code>{{ run_id }}</code>, played back
+  one turn at a time. No model was called and no browser is running.
+</div>
+
+<h1>Discovery recording</h1>
+<div style="margin-bottom:14px">
+  <span class="badge neutral">{{ run_id }}</span>
+  <span class="badge neutral">turn {{ view.turns|length }} of {{ total }}</span>
+  <span class="badge neutral">{{ "{:,}".format(view.total_tokens) }} tokens</span>
+</div>
+
+{{ turn_log(view, running=not at_end) }}
+
+<div class="button-row" style="margin-top:20px">
+  {% if at_end %}
+  <a href="/discover/rehearse?run_id={{ run_id }}&step=1"><button type="button" class="secondary">Replay</button></a>
+  {% else %}
+  <a href="/discover/rehearse?run_id={{ run_id }}&step={{ total }}"><button type="button" class="secondary">Skip to end</button></a>
+  {% endif %}
+  <a href="/discover" class="small">Discovery</a>
+  <a href="/evidence/{{ run_id }}/transcript.jsonl" class="small">Raw transcript</a>
+</div>
+{% endblock %}

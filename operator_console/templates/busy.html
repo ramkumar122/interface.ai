@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Run in progress — Operator Console{% endblock %}
+{% block content %}
+<h1>A run is already in progress</h1>
+<div class="notice warn">{{ message }}</div>
+{% if active %}
+<p><a href="/run/{{ active.run_id }}/status">Go to run {{ active.run_id }} &rarr;</a></p>
+{% endif %}
+<p class="small muted">
+  The console drives one visible browser window. Two runs would fight over
+  the same page, and during an escalation one of them would be the page a
+  human is working in.
+</p>
+{% endblock %}

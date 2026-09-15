@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, risk_badge, verified %}
+{% set nav = 'catalog' %}
+{% block title %}{{ entry.capability_id }} — Operator Console{% endblock %}
+{% block content %}
+<p class="small"><a href="/">&larr; Catalog</a></p>
+<h1>{{ entry.capability_id }}</h1>
+<div style="margin-bottom:14px">
+  <span class="badge neutral">v{{ entry.version }}</span>
+  {{ status_badge(entry.status) }}
+  {{ risk_badge(entry.risk_class) }}
+  {{ verified(entry.verified_runs) }}
+</div>
+<p class="lede">{{ entry.artifact.description }}</p>
+
+{% if newer and resolved_from_bare_id %}
+<div class="notice info">
+  A newer version exists
+  ({% for n in newer %}v{{ n.version }} ({{ n.status }}){{ ', ' if not loop.last }}{% endfor %}).
+  This link asked for the capability by id, which resolves to the newest
+  <em>approved</em> version — a caller should be handed what it may run,
+  not the newest draft.
+</div>
+{% elif newer %}
+<div class="notice info">
+  A newer version exists:
+  {% for n in newer %}v{{ n.version }} ({{ n.status }}){{ ', ' if not loop.last }}{% endfor %}.
+</div>
+{% endif %}
+
+{% if not entry.runnable %}
+<div class="notice warn">
+  <strong>This capability cannot be run.</strong>
+  {{ entry.run_blocked_reason }}
+  <span class="why"><a href="/review/{{ entry.key }}">Review it &rarr;</a></span>
+</div>
+{% endif %}
+
+<h2>Inputs</h2>
+{% if not entry.artifact.inputs %}
+<p class="muted small">This capability declares no inputs.</p>
+{% endif %}
+<form method="post" action="/run/{{ entry.key }}">
+  {% for i in entry.artifact.inputs %}
+  <div class="field">
+    <label class="name" for="in_{{ i.name }}">
+      {{ i.name }}<span class="req">required &middot; {{ i.type }}</span>
+    </label>
+    <div class="help">{{ i.description }}</div>
+    <input type="text" id="in_{{ i.name }}" name="{{ i.name }}"
+           {% if i.example %}placeholder="{{ i.example }}"{% endif %}
+           value="{{ prefill.get(i.name, '') }}"
+           {% if not entry.runnable %}disabled{% endif %} required>
+  </div>
+  {% endfor %}
+  <div class="button-row">
+    <button type="submit" {% if not entry.runnable %}disabled{% endif %}>Run</button>
+    {% if entry.runnable %}
+    <span class="small muted">Runs against live CoreDesk in a visible browser window.</span>
+    {% endif %}
+  </div>
+</form>
+<p class="small muted" style="margin-top:14px">
+  This form is generated from <code>artifact.inputs</code>. Every declared
+  input is required: the engine has no notion of an optional one, and an
+  absent input silently becomes an empty string.
+</p>
+
+<h2>Returns</h2>
+<table class="data">
+  <thead><tr><th>Output</th><th>Type</th><th>Shape</th></tr></thead>
+  <tbody>
+    {% for o in entry.artifact.outputs %}
+    <tr>
+      <td class="mono">{{ o.name }}</td>
+      <td class="mono">{{ o.type }}</td>
+      <td>{{ o.shape }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Non-success results the caller must handle</h2>
+{% if not entry.artifact.known_outcomes %}
+<div class="notice warn">
+  This capability declares no known outcomes. Every non-success result
+  reaches the caller as a failure.
+</div>
+{% else %}
+<table class="data">
+  <thead><tr><th>Outcome</th><th>Means</th><th>Caller action</th></tr></thead>
+  <tbody>
+    {% for ko in entry.artifact.known_outcomes %}
+    <tr>
+      <td class="mono">{{ ko.id }}</td>
+      <td>{{ ko.business_meaning }}</td>
+      <td class="mono">{{ ko.caller_action }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

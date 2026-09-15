@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% set nav = 'discover' %}
+{% block title %}Recordings — Operator Console{% endblock %}
+{% block content %}
+<h1>Discovery recordings</h1>
+<p class="lede">Saved runs, replayed with no model and no browser.</p>
+{% if not recordings %}
+<div class="empty">No discovery transcripts in evidence/.</div>
+{% endif %}
+<ul class="plain">
+  {% for run_id, count, note in recordings %}
+  <li><a href="/discover/rehearse?run_id={{ run_id }}&step=1">{{ run_id }}</a>
+    <span class="small muted">— {{ count }} turns, {{ note }}</span></li>
+  {% endfor %}
+</ul>
+{% endblock %}

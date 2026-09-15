@@ -1,0 +1,36 @@
+{# The step log, from StepTrace. Rendered the same on every result status:
+   a run that failed at step 4 completed three steps, and those three are
+   as real as any. #}
+{% macro step_log(rows) %}
+{% if rows %}
+<table class="data steplog">
+  <thead>
+    <tr><th>#</th><th>Step</th><th>Rung</th><th class="num">ms</th></tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td class="mono">{{ r.ordinal }}</td>
+      <td>
+        {{ r.intent }}
+        <div class="small muted mono">{{ r.step_id }}</div>
+        {% for detector, action, attempt in r.recoveries %}
+        <div class="recovery">
+          recovered: {{ detector }} &rarr; {{ action }} (attempt {{ attempt }})
+        </div>
+        {% endfor %}
+      </td>
+      <td><span class="badge neutral">{{ r.rung }}</span></td>
+      <td class="mono num">{{ r.elapsed_ms }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="small muted">
+  Rung is the locator strategy that resolved each step, from
+  <code>StepTrace.locator_strategy</code>.
+</p>
+{% else %}
+<p class="muted small">No steps completed.</p>
+{% endif %}
+{% endmacro %}

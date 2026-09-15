@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% from "_steps.html" import step_log %}
+{% from "_intervention.html" import intervention %}
+{% set nav = 'catalog' %}
+{% block title %}Run {{ state.run_id }} — Operator Console{% endblock %}
+{% block head %}
+{% if state.in_flight %}
+{# Server-rendered polling. The page re-renders each second while the run is
+   in flight and stops when it settles. No JavaScript, no websocket. #}
+<meta http-equiv="refresh" content="1">
+{% endif %}
+{% endblock %}
+{% block content %}
+<p class="small"><a href="/">&larr; Catalog</a></p>
+<h1>{{ state.capability_id }}</h1>
+<div style="margin-bottom:16px">
+  <span class="badge neutral">{{ state.run_id }}</span>
+  <span class="badge neutral">policy {{ state.policy_mode }}</span>
+  {% if state.watch %}<span class="badge safe">review run</span>{% endif %}
+</div>
+
+<dl class="kv" style="margin-bottom:20px">
+  {% for name, value in state.inputs.items() %}
+  <dt>{{ name }}</dt><dd>{{ value|redact }}</dd>
+  {% endfor %}
+</dl>
+
+{% if state.policy_mode == 'discovery' %}
+<div class="notice info">
+  Running under <code>DISCOVERY</code> policy mode because this artifact is
+  not approved. <code>REPLAY</code> checks the content hash first and would
+  refuse before a step executed — you would see a refusal, not a
+  demonstration.
+</div>
+{% endif %}
+
+{% if state.in_flight %}
+<div class="running">
+  <div class="pulse"></div>
+  <div>
+    <strong>Running</strong> &middot; {{ state.elapsed_s }}s
+    &middot; {{ state.actions_dispatched }} actions dispatched
+    {% if state.current_url %}
+    <div class="small muted mono">at {{ state.current_url }}</div>
+    {% endif %}
+    <div class="small muted">
+      live counter shows actions dispatched, not steps &mdash; recoveries
+      also act. The per-step log appears when the run settles.
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if state.error %}
+<div class="notice stop">
+  <strong>The run did not complete.</strong>
+  <span class="why">{{ state.error }}</span>
+</div>
+{% endif %}
+
+{% if view %}
+{% if view.panel == 'success' %}
+<div class="notice ok"><strong>Success.</strong> Every declared output was filled.</div>
+<h2>Outputs</h2>
+<table class="data">
+  <thead><tr><th>Output</th><th>Value</th><th>Type</th></tr></thead>
+  <tbody>
+    {% for name, value, type_ in view.outputs %}
+    <tr><td class="mono">{{ name }}</td>
+      <td class="mono answer">{{ value }}</td>
+      <td class="mono muted">{{ type_ }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h2>Drift</h2>
+{% for d in view.drift.signals %}
+<div class="notice warn">
+  <strong>{{ d.step_id }}</strong>: primary {{ d.primary_strategy }} missed,
+  {{ d.matched_strategy }} matched. {{ d.detail }}
+</div>
+{% endfor %}
+<p class="small muted">{{ view.drift.note }}</p>
+
+{% elif view.panel == 'outcome_return' %}
+<div class="answer-panel">
+  <div class="answer-label">Answer</div>
+  <p class="answer-text">{{ view.message }}</p>
+  <p class="small muted">
+    This is a business outcome, not an error: <code>{{ view.outcome_id }}</code>,
+    detected at step <code>{{ view.at_step }}</code>, with
+    <code>caller_action: return</code>. The capability worked; the answer is
+    that there is nothing to return.
+  </p>
+  {% if view.detected_as and view.detected_as != view.message %}
+  <p class="small muted">
+    The sentence above is the artifact's <code>business_meaning</code>: what
+    this outcome means for the caller. What was detected:
+    <code>{{ view.detected_as }}</code>.
+  </p>
+  {% endif %}
+</div>
+
+{% elif view.panel == 'outcome_retry' %}
+<div class="answer-panel">
+  <div class="answer-label">Needs a different input</div>
+  <p class="answer-text">{{ view.follow_up_prompt }}</p>
+  <p class="small muted">
+    <code>{{ view.outcome_id }}</code> at step <code>{{ view.at_step }}</code>,
+    with <code>caller_action: retry_with_different_input</code>. The prompt
+    above is the artifact's own <code>business_meaning</code> — nothing here
+    parses the message.
+  </p>
+  <form method="post" action="/run/{{ state.capability_key }}">
+    {% if view.retry_input %}
+    <div class="field">
+      <label class="name" for="retry_{{ view.retry_input }}">{{ view.retry_input }}</label>
+      <input type="text" id="retry_{{ view.retry_input }}"
+             name="{{ view.retry_input }}" value="{{ view.retry_value }}" required>
+    </div>
+    {% else %}
+    {% for name, value in state.inputs.items() %}
+    <div class="field">
+      <label class="name" for="retry_{{ name }}">{{ name }}</label>
+      <input type="text" id="retry_{{ name }}" name="{{ name }}"
+             value="{{ value }}" required>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="button-row"><button type="submit">Run again</button></div>
+  </form>
+</div>
+
+{% elif view.panel == 'outcome_escalate' %}
+<div class="notice warn">
+  <strong>{{ view.outcome_id }}</strong> at step <code>{{ view.at_step }}</code>
+  declares <code>caller_action: escalate</code>. {{ view.message }}
+</div>
+<p class="small muted">
+  The artifact says a person must handle this outcome. The engine returned it
+  as a business outcome rather than an escalation, so the browser was not
+  handed over and there is no resume signal to give.
+</p>
+
+{% elif view.panel == 'failure' %}
+<div class="notice stop">
+  <strong>Failure at step {{ view.failure.step_id }}.</strong>
+  {{ view.failure.step_intent }}
+</div>
+<dl class="kv">
+  <dt>expected</dt><dd>{{ view.failure.expected }}</dd>
+  <dt>observed</dt><dd>{{ view.failure.observed }}</dd>
+  <dt>locator rung</dt><dd>{{ view.failure.locator_rung or '—' }}</dd>
+  <dt>error</dt><dd>{{ view.failure.error }}</dd>
+</dl>
+{% if view.evidence_links %}
+<h3>Evidence</h3>
+<ul class="plain">
+  {% for link in view.evidence_links %}
+  <li><a href="/evidence/{{ link }}">{{ link }}</a></li>
+  {% endfor %}
+</ul>
+{% for link in view.evidence_links if link.endswith('.png') %}
+<img class="shot" src="/evidence/{{ link }}" alt="The page when the run failed">
+{% endfor %}
+{% else %}
+<p class="small muted">
+  No screenshot was captured for this failure. The run's evidence directory
+  is <code>evidence/{{ state.run_id }}/</code>.
+</p>
+{% endif %}
+
+{% elif view.panel == 'intervention' %}
+{{ intervention(state, view.request, view.resume_token) }}
+{% endif %}
+
+<h2>Step log</h2>
+{{ step_log(view.steps) }}
+{% endif %}
+
+{% if not state.in_flight %}
+<div class="button-row" style="margin-top:24px">
+  <a href="/capability/{{ state.capability_key }}"><button type="button" class="secondary">Run again</button></a>
+  <a href="/" class="small">Catalog</a>
+</div>
+{% endif %}
+{% endblock %}

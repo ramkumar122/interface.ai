@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% set nav = 'discover' %}
+{% block title %}Discover a capability — Operator Console{% endblock %}
+{% block content %}
+<h1>Discover a capability</h1>
+<p class="lede">
+  Describe a goal in plain English. A model drives CoreDesk until it reaches
+  the goal, and what it learns is compiled into a capability.
+</p>
+
+<div class="notice info">
+  <strong>This screen takes language. Every other screen takes parameters.</strong>
+  A model works out how to do this once. What it produces is a capability
+  invoked with typed inputs and no model in the loop — the Run form in the
+  catalog. Discovery costs API credits; replay costs none.
+</div>
+
+{% if blocked %}
+<div class="notice warn"><strong>Discovery is unavailable.</strong> {{ blocked }}</div>
+{% endif %}
+
+{% if errors %}
+<div class="notice stop">
+  <ul class="plain">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form method="post" action="/discover" autocomplete="off">
+  <div class="field">
+    <label class="name" for="goal">Goal<span class="req">required · natural language</span></label>
+    <div class="help">One sentence. The model sees this and nothing about how the app works.</div>
+    <textarea id="goal" name="goal" rows="3" placeholder="{{ goal_placeholder }}"
+              {% if blocked %}disabled{% endif %}>{{ goal }}</textarea>
+  </div>
+
+  <div class="field">
+    <label class="name" for="target">Target URL<span class="req">entry point</span></label>
+    <input type="text" id="target" name="target" value="{{ target_default }}"
+           {% if blocked %}disabled{% endif %}>
+  </div>
+
+  <h3>Inputs</h3>
+  <p class="small muted">
+    Declared parameters. The model substitutes these by name and never sees
+    the values as free text.
+  </p>
+  <p class="small muted">
+    A capability must replay against a second record before it can be
+    verified. The same values twice prove determinism, not portability.
+  </p>
+  <div class="row-pair row-head small muted">
+    <span>name</span><span>first record</span><span>second record</span>
+  </div>
+  {% for row in input_rows %}
+  <div class="row-pair">
+    <input type="text" name="input_name" placeholder="member_no" value="{{ row.name }}"
+           {% if blocked %}disabled{% endif %}>
+    <input type="text" name="input_value" placeholder="100101" value="{{ row.value }}"
+           {% if blocked %}disabled{% endif %}>
+    <input type="text" name="input_value2" placeholder="100110" value="{{ row.value2 }}"
+           {% if blocked %}disabled{% endif %}>
+  </div>
+  {% endfor %}
+  <button type="submit" name="add_input" value="1" class="secondary small-btn"
+          {% if blocked %}disabled{% endif %} formnovalidate>+ input</button>
+
+  <h3>Outputs</h3>
+  <p class="small muted">
+    Optional. What the capability returns, if anything. Add a row only when
+    the goal extracts a value — a lock or a navigation has none.
+    Verification compares these across runs when they exist.
+  </p>
+  {% if output_rows %}
+  {% for row in output_rows %}
+  <div class="row-pair">
+    <input type="text" name="output_name" placeholder="the_value" value="{{ row.name }}"
+           autocomplete="off" {% if blocked %}disabled{% endif %}>
+    <select name="output_type" {% if blocked %}disabled{% endif %}>
+      {% for t in output_types %}
+      <option value="{{ t }}" {% if row.type == t %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="small muted">None declared.</p>
+  {% endif %}
+  <p class="small muted">
+    <code>money</code> is parsed at read time and the run fails if the value
+    is not money — that check is what catches a locator that resolves onto
+    the wrong column and returns something like <code>OPEN</code>.
+    <code>text</code> accepts anything. Those are the only two the engine
+    validates, so they are the only two offered.
+  </p>
+  <button type="submit" name="add_output" value="1" class="secondary small-btn"
+          {% if blocked %}disabled{% endif %} formnovalidate>+ output</button>
+
+  <h3>Recording</h3>
+  <div class="field">
+    <label class="name" for="capability_id">Capability id<span class="req">required</span></label>
+    <input type="text" id="capability_id" name="capability_id"
+           placeholder="coredesk.member.read_savings_balance"
+           value="{{ capability_id }}" {% if blocked %}disabled{% endif %}>
+  </div>
+
+  <div class="field">
+    <label class="name" for="verify_runs">Verify runs</label>
+    <div class="help">
+      Replays of the compiled artifact, outputs compared. This is replays
+      <em>per record</em>: the stamped <code>verified_runs</code> counts every
+      run across both, so 2 here becomes 3. Zero means nothing proves it
+      works, and nothing is written.
+    </div>
+    <input type="text" id="verify_runs" name="verify_runs" value="{{ verify_runs }}"
+           {% if blocked %}disabled{% endif %}>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" {% if blocked %}disabled{% endif %}>Discover</button>
+    <span class="small muted">
+      Spends API credits on {{ model }}, and opens a browser window you can watch.
+    </span>
+  </div>
+</form>
+
+{% if recordings %}
+<h2>Or watch a recording</h2>
+<p class="small muted">
+  A saved run, replayed step by step. No model is called and no browser
+  opens — useful without a key, and repeatable for a demo.
+</p>
+<ul class="plain">
+  {% for run_id, count, note in recordings %}
+  <li><a href="/discover/rehearse?run_id={{ run_id }}&step=1">{{ run_id }}</a>
+    <span class="small muted">— {{ count }} turns, {{ note }}</span></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

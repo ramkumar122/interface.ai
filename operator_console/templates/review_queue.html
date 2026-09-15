@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, risk_badge %}
+{% set nav = 'review' %}
+{% block title %}Review queue — Operator Console{% endblock %}
+{% block content %}
+<h1>Review queue</h1>
+<p class="lede">
+  Capabilities awaiting a human gate. A machine gate has to pass first:
+  verification proves the artifact replays deterministically, and
+  <code>approve()</code> refuses without it.
+</p>
+
+{% if not catalog.drafts %}
+<div class="empty">
+  Nothing in draft. Discovery compiles new capabilities here.
+</div>
+{% endif %}
+
+{% for e in catalog.drafts %}
+<div class="card">
+  <div class="card-head">
+    <span class="id">{{ e.capability_id }}</span>
+    <span class="badge neutral">v{{ e.version }}</span>
+    {{ status_badge(e.status) }}
+    {{ risk_badge(e.risk_class) }}
+    <span class="card-actions">
+      {% if e.verified_runs is none %}
+      <span class="badge warn">blocked</span>
+      {% else %}
+      <a href="/review/{{ e.key }}"><button type="button">Review</button></a>
+      {% endif %}
+    </span>
+  </div>
+  <p class="small muted" style="margin-bottom:12px">{{ e.artifact.description }}</p>
+
+  <h3>Discovery provenance</h3>
+  <dl class="kv">
+    <dt>run</dt><dd>{{ e.artifact.created_from.run_id }}</dd>
+    <dt>model</dt><dd>{{ e.artifact.created_from.model }}</dd>
+    <dt>steps in transcript</dt><dd>{{ e.artifact.created_from.steps_in_transcript }}</dd>
+    <dt>wall time</dt><dd>{{ e.artifact.created_from.wall_seconds }}s</dd>
+    <dt>compiled to</dt><dd>{{ e.artifact.steps|length }} steps</dd>
+  </dl>
+
+  {% if e.verified_runs is none %}
+  <div class="notice warn" style="margin-top:14px">
+    <strong>Blocked — cannot be approved.</strong>
+    Cannot approve: verified_runs is not set. Run verification first to
+    prove the artifact replays deterministically
+    (e.g. <code>python scripts/verify_gate.py --variant clean</code>).
+    <span class="why">
+      No Approve button is offered because <code>approve()</code> would
+      raise. A button that fails is worse than no button.
+    </span>
+  </div>
+  {% else %}
+  <div class="notice ok" style="margin-top:14px">
+    Verified: replayed cleanly {{ e.verified_runs }} times with matching
+    outputs. The machine gate has passed; the human gate is open.
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% if catalog.revoked %}
+<h2>Revoked</h2>
+<p class="small muted">
+  Not draft, but not runnable either. A reviewer looking for what is blocked
+  needs to see these.
+</p>
+{% for e in catalog.revoked %}
+<div class="card">
+  <div class="card-head">
+    <span class="id">{{ e.capability_id }}</span>
+    <span class="badge neutral">v{{ e.version }}</span>
+    {{ status_badge(e.status) }}
+    <span class="card-actions"><a href="/review/{{ e.key }}" class="small">Review</a></span>
+  </div>
+  <p class="small muted">
+    Approval was revoked and the content hash cleared. Replay refuses it.
+  </p>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

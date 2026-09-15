@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Operator Console{% endblock %}</title>
+<link rel="stylesheet" href="/static/operator.css">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="masthead">
+  <span class="title">Operator Console</span>
+  <span class="target">artifacts/ &middot; CoreDesk {{ target_origin }}</span>
+  <nav>
+    <a href="/" {% if nav == 'catalog' %}class="current"{% endif %}>Catalog</a>
+    <a href="/discover" {% if nav == 'discover' %}class="current"{% endif %}>Discover</a>
+    <a href="/review" {% if nav == 'review' %}class="current"{% endif %}>Review queue</a>
+  </nav>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
