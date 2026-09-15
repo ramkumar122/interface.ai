@@ -1,0 +1,24 @@
+{
+  "status": "business_outcome",
+  "member_no": "999999",
+  "injection": null,
+  "inject_count": null,
+  "elapsed_s": 11.2,
+  "screenshot": "final-state.png",
+  "outcome_id": "MEMBER_NOT_FOUND",
+  "condition": "Search returns zero results for the given member_no",
+  "message": "The member number does not exist in the system",
+  "caller_action": "return",
+  "at_step": "click_search",
+  "steps_completed": [
+    {
+      "step_id": "click_menu",
+      "elapsed_ms": 597.7
+    },
+    {
+      "step_id": "type_member_no",
+      "elapsed_ms": 20.2
+    }
+  ],
+  "variant": "business-outcome"
+}

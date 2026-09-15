@@ -1,0 +1,31 @@
+{
+  "gate": "approval-two-gate",
+  "phase_1_approved_valid": {
+    "status": "approved",
+    "hash": "sha256:ecf2bd7252a4b03542db49f145000d83c433bb1f2f9559a29b19f3b3abf0c15b",
+    "verified_runs": 3,
+    "check_passed": true,
+    "check_reason": "approved, hash valid"
+  },
+  "phase_2_unverified_blocked": {
+    "verified_runs": null,
+    "approve_blocked": true,
+    "reason": "Cannot approve: verified_runs is not set. Run verification first to prove the artifact replays deterministically (e.g. `python scripts/verify_gate.py --variant clean`)."
+  },
+  "phase_3_tampered_refused": {
+    "edit": "step[0].target.name: MBRINQ -> MBRINX",
+    "current_hash": "sha256:e8030f3caff46e794a5663664a9c6b16416b10500e9dedd2d59002d8fdf583bc",
+    "check_passed": false,
+    "check_reason": "Content hash mismatch: approved hash 'sha256:ecf2bd7252a4b03542db49f145000d83c433bb1f2f9559a29b19f3b3abf0c15b', current 'sha256:e8030f3caff46e794a5663664a9c6b16416b10500e9dedd2d59002d8fdf583bc'. The artifact has been modified since approval. Run `cli revoke` then `cli approve`.",
+    "replay_status": "failure",
+    "replay_error": "approval check failed: Content hash mismatch: approved hash 'sha256:ecf2bd7252a4b03542db49f145000d83c433bb1f2f9559a29b19f3b3abf0c15b', current 'sha256:e8030f3caff46e794a5663664a9c6b16416b10500e9dedd2d59002d8fdf583bc'. The artifact has been modified since approval. Run `cli revoke` then `cli approve`.",
+    "replay_refused_at_step": "(pre-replay)",
+    "browser_used": false
+  },
+  "phase_4_stale_write_refused": {
+    "write_blocked": true,
+    "reason": "Cannot write approved artifact with stale hash. Approved: 'sha256:ecf2bd7252a4b03542db49f145000d83c433bb1f2f9559a29b19f3b3abf0c15b', current: 'sha256:e8030f3caff46e794a5663664a9c6b16416b10500e9dedd2d59002d8fdf583bc'. Run `cli revoke` first, or `cli approve` to re-approve."
+  },
+  "note": "No browser, no model, no CoreDesk. Every refusal here happens before a step executes, which is the point: approval is checked against a hash of the artifact's execution fields, not against a status flag anyone can edit.",
+  "artifacts_mutated": false
+}

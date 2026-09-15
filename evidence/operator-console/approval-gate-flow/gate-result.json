@@ -1,0 +1,21 @@
+{
+  "gate": "approval-gate-flow",
+  "what": "The approval gate made visible: an unapproved capability is absent from the catalog, the checklist explains what to check, and approving puts it in the list.",
+  "1_draft_absent_from_catalog": {
+    "capability": "coredesk.member.read_savings_balance@2.0",
+    "in_catalog": false,
+    "checked_by": "presence of /capability/<id>@<version> in the catalog, not an id substring \u2014 both versions share the id",
+    "header": "2 approved &middot; 2 awaiting review &rarr;"
+  },
+  "2_review": {
+    "artifact_source_byte_identical_to_disk": true,
+    "checklist_explains": true
+  },
+  "3_approved": {
+    "approved_by": "D. PARK \u2014 Risk / Ops",
+    "content_hash": "sha256:cb3082b931b652fbafd824395b83e6a4659bdb98dbefa2e10452e429cbe3b9b9",
+    "redirected_to": "/?approved=coredesk.member.read_savings_balance@2.0",
+    "header_after": "2 approved &middot; 1 awaiting review &rarr;",
+    "listed_and_highlighted": true
+  }
+}

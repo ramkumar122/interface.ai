@@ -1,0 +1,61 @@
+%%{init: {'theme':'dark'}}%%
+sequenceDiagram
+    autonumber
+    participant CLI as run_discover.py
+    participant PW as Playwright
+    participant CD as CoreDesk
+    participant W as web.py
+    participant LP as loop.py
+    participant PO as policy.py
+    participant B as brain.py
+    participant G as Gemini API
+
+    CLI->>B: GeminiBrain construct
+    CLI->>PW: chromium launch and new_page
+    Note over CLI,CD: Sign-in is in the harness. Password never goes to Gemini.
+    CLI->>CD: fill user id and password, click Sign On
+    CD-->>CLI: session cookie and menu
+    CLI->>W: WebSurface construct
+    CLI->>LP: DiscoveryLoop run
+    LP->>B: configure tools and RULES
+
+    Note over LP,G: Turn N, up to 25 times
+    LP->>W: observe
+    W->>PW: aria_snapshot per frame
+    PW->>CD: GET current page
+    CD-->>PW: HTML
+    W->>W: parse tree, assign refs, strip passwords
+    W-->>LP: Observation
+    LP->>LP: build compacted history plus current obs
+    LP->>B: decide
+    B->>G: generate_content mode ANY, AFC off
+    G-->>B: function_call click ref e39
+    B-->>LP: BrainResponse
+    LP->>LP: build_action, validate into_output and from_input
+
+    alt name not in declared inputs or outputs
+        LP->>LP: write StepRecord invalid_action
+        LP-->>LP: next turn, feedback to the model
+        Note over LP: The enum advises — this check is what binds.
+    else names are declared
+        LP->>LP: find Node by ref in this observation only
+        LP->>PO: policy_check mode DISCOVERY
+        PO-->>LP: Verdict
+
+        alt policy blocked
+            LP->>LP: write StepRecord policy_blocked
+            LP-->>LP: next turn
+        else done or escalate or give_up or stuck
+            LP->>W: act Done
+            LP-->>CLI: DiscoveryResult
+            Note over LP,CLI: stuck ends the CLI run. The console instead<br/>pauses and hands the browser to a human.
+        else click or type or read
+            LP->>W: act
+            W->>PW: get_by_role click or fill
+            PW->>CD: click or POST
+            CD-->>PW: next page
+            W-->>LP: ActionResult and ResolutionTrace
+            LP->>W: observe again
+            LP->>LP: write transcript.jsonl
+        end
+    end

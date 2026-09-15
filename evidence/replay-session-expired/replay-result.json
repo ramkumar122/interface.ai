@@ -1,0 +1,15 @@
+{
+  "status": "escalated",
+  "member_no": "100101",
+  "injection": "session_expired",
+  "inject_count": 0,
+  "elapsed_s": 0.1,
+  "screenshot": "final-state.png",
+  "step_id": "click_menu",
+  "step_intent": "Click the Member Inquiry menu link to open the member search screen",
+  "reason": "detected: session_expired",
+  "instructions": "The session has expired. Please sign in again as the current operator. Then navigate to the correct screen (step: 'Click the Member Inquiry menu link to open the member search screen'). Parameters: member_no=100101.",
+  "resume_token": ":click_menu:1",
+  "steps_completed": [],
+  "variant": "session-expired"
+}
