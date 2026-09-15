@@ -1,0 +1,28 @@
+{
+  "gate": "discovery-flow",
+  "what": "One continuous path from a sentence typed into the console to an approved capability.",
+  "1_goal_in_natural_language": {
+    "typed_into": "GET /discover",
+    "goal": "Find member 100101 and read their primary savings (SAVINGS suffix 0000) available balance."
+  },
+  "2_discovery": {
+    "run_id": "discover-gemini-3.6-flash-4a4d7292",
+    "model": "gemini-3.6-flash",
+    "turns": 6,
+    "tokens": 14163,
+    "status": "done",
+    "rendered_live_from": "evidence/<run_id>/transcript.jsonl, which the loop flushes per turn"
+  },
+  "3_gates": {
+    "compiled": true,
+    "verified": true,
+    "verify_runs": 2,
+    "written_as": "artifacts/coredesk.member.read_savings_balance_demo@1.json"
+  },
+  "4_review_screen": "/review/coredesk.member.read_savings_balance_demo@1.0",
+  "rehearsal": {
+    "url": "/discover/rehearse?run_id=discover-gemini-3.6-flash-4a4d7292&step=1",
+    "what": "the same run replayed with no model and no browser"
+  },
+  "note": "The run id changes every time this is regenerated. Anything quoting it must be updated \u2014 see docs/REGENERATE_EVIDENCE.md."
+}

@@ -318,14 +318,26 @@ def capture_discovery() -> int:
     print("    submitting the goal")
     r = post("/discover", {
         "goal": GOAL, "target": f"{COREDESK}/menu",
-        "input_name": "member_no", "input_value": "100101",
+        # Two records. Verification refuses a capability with declared
+        # inputs and only one — the same values twice prove determinism,
+        # not portability — and the form now checks that before the model
+        # runs rather than after the credits are spent.
+        "input_name": "member_no",
+        "input_value": "100101", "input_value2": "100110",
         "output_name": "savings_balance", "output_type": "money",
         "capability_id": cap_id, "verify_runs": "2",
     }, follow=False)
     loc = r.headers.get("Location", "")
     if "/run/" not in loc:
+        # A 200 here means the form came back with its errors rendered
+        # instead of redirecting. Printing the status alone says nothing;
+        # the reason is in the body, so surface it.
+        body = r.read().decode(errors="replace") if hasattr(r, "read") else ""
+        reasons = re.findall(r"<li>([^<]+)</li>", body)
         print("    the console refused to start it:", loc or r.status,
               file=sys.stderr)
+        for reason in reasons[:5]:
+            print(f"      - {reason.strip()}", file=sys.stderr)
         return 1
     run_id = loc.split("/run/")[1].split("/status")[0]
     print(f"    run {run_id} — waiting for it to settle")

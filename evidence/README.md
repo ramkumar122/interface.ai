@@ -26,8 +26,8 @@ everything after them is a supporting case.
    human takes the session, hands it back, and the capability finishes. The
    audit log names who did which half.
 
-Then `operator-console/discovery-flow/` for the whole arc in one place:
-a sentence of English in, an approved capability out.
+Then **`operator-console/discovery-flow/`** for the whole arc in one place:
+a sentence of English in, a verified capability out.
 
 The tables below are the rest.
 
@@ -71,11 +71,20 @@ because each shows a gate refusing something a test cannot stage.  Cited in
 | `approval-gate/` | Four phases holding: approved+valid hash passes, unverified blocks approval, a tampered artifact fails at `(pre-replay)`, and writing the tampered one is blocked. Works on copies in a temp directory and re-checks the shipped artifact is byte-identical afterwards. | Safety |
 | `verify-gate-wrong-value/` | **The silent-wrong-answer catch.** The balance column is renamed `STATUS`, which resolves cleanly — no locate error — and returns `OPEN` where money was expected. Diagnostic: `'OPEN' is not valid money`. A pass here would mean the gate is broken. | Verify |
 
-## Still to produce
+## The console
 
-`operator-console/` — the console's own captures (discovery flow, approval-gate
-flow, escalation handoff).  Steps 11 and 12 of the runbook: one needs a person
-at the browser window, the other spends API credits.
+`operator-console/` holds the console's own captures, one subdirectory per
+flow.  Both were driven by `scripts/console_evidence.py`.
+
+| Directory | What it demonstrates | Requirement |
+|---|---|---|
+| `operator-console/discovery-flow/` | **A sentence in, an approved capability out.** The goal typed as free text, six model turns rendered live from the transcript the loop flushes, compile and verify as they happen, the artifact written as a draft, and the review screen it lands on. `gate-result.json` names each stage. | Discovery |
+| `operator-console/approval-gate-flow/` | The approval gate made visible: a draft is **absent** from the catalog, the review screen shows the artifact byte for byte with a checklist that explains what to check, and approving through the console's own route puts it in the list. | Safety |
+| `discover-gemini-3.6-flash-4a4d7292/` | The transcript behind the flow above — 6 turns, 14,163 tokens, `savings_balance: 12,845.50`. Kept because rehearsal mode replays it with no model and no browser: `/discover/rehearse?run_id=discover-gemini-3.6-flash-4a4d7292&step=1`. | Discovery |
+
+The compiled artifact is `coredesk.member.read_savings_balance_demo@1.0`,
+stamped `verified_runs: 3` — two replays on member 100101 and one on 100110,
+because the same values twice prove determinism and not portability.
 
 ## Notes
 
