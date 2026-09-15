@@ -512,7 +512,8 @@ def card_maint_apply(
     if action == "UNLOCK" and c.status == "ACTIVE":
         return _re("info", "Card is already active. No change applied.")
 
-    ref = set_card_status(card_id, new_status, reason, notes, sess["username"], "HUMAN")
+    actor = getattr(request.state, "actor", "HUMAN")
+    ref = set_card_status(card_id, new_status, reason, notes, sess["username"], actor)
     return RedirectResponse(
         "/member/%s/cards/%s/maint?ref=%s" % (member_no, card_id, ref), status_code=303
     )
@@ -669,9 +670,10 @@ def address_commit(
     if unchanged:
         return RedirectResponse("/member/%s/address?nochange=1" % member_no, status_code=303)
 
+    actor = getattr(request.state, "actor", "HUMAN")
     ref = update_member_address(
         member_no, line1.strip(), line2.strip() or None, city.strip(), state,
-        zip_code.strip(), eff.strip(), sess["username"], "HUMAN",
+        zip_code.strip(), eff.strip(), sess["username"], actor,
     )
     return RedirectResponse("/member/%s/address?ref=%s" % (member_no, ref), status_code=303)
 
@@ -896,5 +898,6 @@ def share_new_commit(
         cancel_share_request(request_id)
         return RedirectResponse("/member/%s/shares/new?cancelled=1" % member_no, status_code=303)
 
-    commit_share_request(request_id, sess["username"], "HUMAN")
+    actor = getattr(request.state, "actor", "HUMAN")
+    commit_share_request(request_id, sess["username"], actor)
     return RedirectResponse("/member/%s" % member_no, status_code=303)
