@@ -5,3 +5,10 @@ itsdangerous==2.2.0
 python-multipart==0.0.20
 pytest==8.3.4
 httpx==0.28.1
+
+# Automation surface (agent-surface spec). Playwright also needs a one-time
+# `playwright install chromium` (see README setup). PyYAML parses the ARIA
+# snapshot YAML and the per-app surface config.
+playwright==1.62.0
+google-genai==2.23.0
+PyYAML==6.0.3

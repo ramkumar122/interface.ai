@@ -1,19 +1,17 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
 .venv/
-venv/
 
-# Test / tooling caches
+# Test cache
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
 
 # CoreDesk generated artifacts (rebuild with: python reset_db.py)
 coredesk.db
 *.db-journal
 
-# OS / editor
+# Secrets — never commit
+.env
+
+# OS
 .DS_Store
-Thumbs.db
