@@ -1,0 +1,58 @@
+%%{init: {'theme':'dark'}}%%
+sequenceDiagram
+    autonumber
+    participant EV as replay_evidence.py
+    participant S as schema.py
+    participant E as engine.py
+    participant AP as approval.py
+    participant D as detect.py
+    participant L as locate.py
+    participant PO as policy.py
+    participant W as web.py
+    participant PW as Playwright
+    participant CD as CoreDesk
+
+    EV->>PW: launch, sign in, goto menu
+    EV->>S: load artifact JSON
+    EV->>E: replay mode REPLAY
+    E->>AP: check_approval
+    AP->>AP: recompute SHA-256 of six hashed fields
+    Note over AP: Tamper check only. Drafts and revoked pass.
+    alt hash mismatch
+        E-->>EV: ReplayFailure pre-replay
+    else hash ok
+        E->>E: artifact_approved = approval.status == "approved"
+        E->>S: apply_overrides if summit
+        E->>D: build_detectors
+        loop each Step
+            E->>W: observe
+            W->>PW: aria snapshot
+            PW-->>E: Observation
+            E->>D: run_detectors pre-locate
+            alt business outcome
+                E-->>EV: ReplayBusinessOutcome
+            else recoverable
+                E->>W: dismiss or re-navigate
+            else escalate
+                E->>W: release to HUMAN
+                E-->>EV: ReplayEscalated
+            else normal page
+                E->>L: locate by role and name
+                Note over L: ax_relative uses column AVAILABLE and row 0000
+                L-->>E: fresh ref
+                E->>PO: policy_check mode REPLAY, artifact_approved
+                Note over PO: guarded_write allowed only when approved
+                alt refused
+                    E-->>EV: ReplayFailure at this step
+                else allowed
+                    E->>W: act
+                    W->>PW: get_by_role
+                    PW->>CD: HTTP
+                    CD-->>PW: next page
+                    W-->>E: ActionResult
+                    E->>E: wait_for next condition
+                end
+            end
+        end
+        E-->>EV: ReplaySuccess with savings_balance
+    end

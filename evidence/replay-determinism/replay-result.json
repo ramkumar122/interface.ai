@@ -1,0 +1,145 @@
+{
+  "variant": "determinism",
+  "description": "Same artifact, three members with different balance shapes",
+  "all_passed": true,
+  "runs": [
+    {
+      "status": "success",
+      "member_no": "100110",
+      "injection": null,
+      "inject_count": null,
+      "elapsed_s": 1.8,
+      "screenshot": "final-state.png",
+      "outputs": {
+        "savings_balance": "74,209.99"
+      },
+      "drift_signals": [],
+      "steps": [
+        {
+          "step_id": "click_menu",
+          "ref": "e30",
+          "strategy": "ax",
+          "elapsed_ms": 585.0
+        },
+        {
+          "step_id": "type_member_no",
+          "ref": "e29",
+          "strategy": "ax",
+          "elapsed_ms": 16.9
+        },
+        {
+          "step_id": "click_search",
+          "ref": "e36",
+          "strategy": "ax",
+          "elapsed_ms": 578.2
+        },
+        {
+          "step_id": "click_select",
+          "ref": "e41",
+          "strategy": "ax",
+          "elapsed_ms": 609.1
+        },
+        {
+          "step_id": "read_balance",
+          "ref": "e74",
+          "strategy": "ax_relative",
+          "elapsed_ms": 19.4
+        }
+      ],
+      "expected_balance": "74,209.99",
+      "match": true
+    },
+    {
+      "status": "success",
+      "member_no": "100111",
+      "injection": null,
+      "inject_count": null,
+      "elapsed_s": 1.8,
+      "screenshot": "final-state.png",
+      "outputs": {
+        "savings_balance": "0.00"
+      },
+      "drift_signals": [],
+      "steps": [
+        {
+          "step_id": "click_menu",
+          "ref": "e30",
+          "strategy": "ax",
+          "elapsed_ms": 599.6
+        },
+        {
+          "step_id": "type_member_no",
+          "ref": "e29",
+          "strategy": "ax",
+          "elapsed_ms": 19.4
+        },
+        {
+          "step_id": "click_search",
+          "ref": "e36",
+          "strategy": "ax",
+          "elapsed_ms": 594.7
+        },
+        {
+          "step_id": "click_select",
+          "ref": "e41",
+          "strategy": "ax",
+          "elapsed_ms": 603.0
+        },
+        {
+          "step_id": "read_balance",
+          "ref": "e74",
+          "strategy": "ax_relative",
+          "elapsed_ms": 17.7
+        }
+      ],
+      "expected_balance": "0.00",
+      "match": true
+    },
+    {
+      "status": "success",
+      "member_no": "100115",
+      "injection": null,
+      "inject_count": null,
+      "elapsed_s": 1.8,
+      "screenshot": "final-state.png",
+      "outputs": {
+        "savings_balance": "2,405.60"
+      },
+      "drift_signals": [],
+      "steps": [
+        {
+          "step_id": "click_menu",
+          "ref": "e30",
+          "strategy": "ax",
+          "elapsed_ms": 599.4
+        },
+        {
+          "step_id": "type_member_no",
+          "ref": "e29",
+          "strategy": "ax",
+          "elapsed_ms": 18.4
+        },
+        {
+          "step_id": "click_search",
+          "ref": "e36",
+          "strategy": "ax",
+          "elapsed_ms": 594.7
+        },
+        {
+          "step_id": "click_select",
+          "ref": "e41",
+          "strategy": "ax",
+          "elapsed_ms": 605.4
+        },
+        {
+          "step_id": "read_balance",
+          "ref": "e74",
+          "strategy": "ax_relative",
+          "elapsed_ms": 17.6
+        }
+      ],
+      "expected_balance": "2,405.60",
+      "match": true
+    }
+  ]
+}

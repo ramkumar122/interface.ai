@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, risk_badge, step_list %}
+{% set nav = 'review' %}
+{% block title %}Review {{ artifact.capability_id }} — Operator Console{% endblock %}
+{% block content %}
+<p class="small"><a href="/review">&larr; Review queue</a></p>
+<h1>{{ artifact.capability_id }}</h1>
+<div style="margin-bottom:14px">
+  <span class="badge neutral">v{{ artifact.version }}</span>
+  {{ status_badge(entry.status) }}
+  {{ risk_badge(entry.risk_class) }}
+</div>
+
+{% if request.query_params.get('approved') %}
+<div class="notice ok">
+  <strong>Approved.</strong> {{ artifact.approval.approved_by }} &middot;
+  {{ artifact.approval.approved_at }}
+  <span class="why">{{ artifact.approval.content_hash }}</span>
+</div>
+{% endif %}
+
+{% if notice %}<div class="notice info">{{ notice }}</div>{% endif %}
+
+{% if errors %}
+<div class="notice stop">
+  <strong>Not approved.</strong>
+  <ul class="plain">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<h2>1 &middot; What it claims to do</h2>
+<p>{{ artifact.description }}</p>
+
+<h3>Inputs</h3>
+<table class="data">
+  <thead><tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th></tr></thead>
+  <tbody>
+    {% for i in artifact.inputs %}
+    <tr><td class="mono">{{ i.name }}</td><td class="mono">{{ i.type }}</td>
+      <td>{{ i.description }}</td><td class="mono">{{ i.example or '—' }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Outputs</h3>
+<table class="data">
+  <thead><tr><th>Name</th><th>Type</th><th>Shape</th></tr></thead>
+  <tbody>
+    {% for o in artifact.outputs %}
+    <tr><td class="mono">{{ o.name }}</td><td class="mono">{{ o.type }}</td>
+      <td>{{ o.shape }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>2 &middot; What it actually did</h2>
+<p class="small muted">
+  Every step as recorded, in English. The intent and each rejection reason
+  print verbatim from the artifact — this screen describes locators, it does
+  not rewrite what the compiler said.
+</p>
+{{ step_list(steps) }}
+<p class="small muted" style="margin-top:14px">
+  {{ rejected_count.sentence }}. A rejected locator is evidence that
+  durability was considered; an empty list on every step is the case worth
+  asking about.
+</p>
+
+{% if entry.runnable or artifact.meta.verified_runs %}
+<form method="post" action="/run/{{ entry.key }}?watch=1" style="margin-top:6px">
+  {% for i in artifact.inputs %}
+  <input type="hidden" name="{{ i.name }}" value="{{ i.example or '' }}">
+  {% endfor %}
+  <div class="button-row">
+    <button type="submit" class="secondary">Run it once and watch</button>
+    <span class="small muted">
+      Replays with the declared example values
+      {%- if artifact.inputs %} ({% for i in artifact.inputs %}{{ i.name }}={{ i.example }}{{ ', ' if not loop.last }}{% endfor %}){% endif %}
+      in a visible browser.
+      {% if entry.status != 'approved' %}
+      A draft runs under <code>DISCOVERY</code> policy mode — the approval
+      check would refuse <code>REPLAY</code> before a step executed.
+      {% endif %}
+    </span>
+  </div>
+</form>
+{% endif %}
+
+<h2>3 &middot; What can go wrong</h2>
+<h3>Known outcomes</h3>
+{% if not outcomes %}
+<div class="notice warn">
+  <strong>No known outcomes are declared.</strong>
+  Every non-success result this capability can produce would reach the
+  caller as a failure. "The declared outcomes are complete" is not a box
+  you can honestly tick against an empty list.
+</div>
+{% else %}
+<table class="data">
+  <thead><tr><th>Outcome</th><th>Means</th><th>Detected by</th><th>Caller action</th></tr></thead>
+  <tbody>
+    {% for row in outcomes %}
+    <tr>
+      <td class="mono">{{ row.outcome.id }}</td>
+      <td>{{ row.outcome.business_meaning }}</td>
+      <td class="small">
+        {% if row.detection %}
+        {% for c in row.detection %}{{ c }}{{ '; ' if not loop.last }}{% endfor %}
+        {% else %}<span class="badge draft">none</span>{% endif %}
+      </td>
+      <td class="mono">{{ row.outcome.caller_action }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% for row in outcomes if row.warning %}
+<div class="notice warn">{{ row.warning }}</div>
+{% endfor %}
+
+<h3>Recoverable conditions</h3>
+{% if not recoverables %}
+<p class="muted small">
+  None declared. Every runtime condition — an expired session, a
+  maintenance dialog, a slow page — would stop the run rather than be
+  handled or escalated.
+</p>
+{% else %}
+<table class="data">
+  <thead><tr><th>Trigger</th><th>Fires when</th><th>Action</th><th>Max attempts</th></tr></thead>
+  <tbody>
+    {% for rec, trigger in recoverables %}
+    <tr>
+      <td class="mono">{{ rec.trigger }}</td>
+      <td class="small">{{ trigger }}</td>
+      <td class="mono">{{ rec.recovery_action or rec.strategy }}</td>
+      <td class="mono">{{ rec.max_retries }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>4 &middot; Evidence</h2>
+<h3>Verification</h3>
+<p class="small">{{ evidence.verification_note }}</p>
+{% if evidence.reports %}
+<p class="small muted">{{ evidence.association_note }}</p>
+{% endif %}
+{% for r in evidence.reports %}
+<div class="card">
+  <div class="card-head">
+    <span class="id">evidence/{{ r.directory }}/</span>
+    {% if r.status %}<span class="badge {{ 'safe' if r.status == 'success' else 'neutral' }}">{{ r.status }}</span>{% endif %}
+  </div>
+  {% if r.note %}<p class="small muted">{{ r.note }}</p>{% endif %}
+  {% if r.outputs %}
+  <table class="data">
+    <thead><tr><th>Output</th><th>Value</th></tr></thead>
+    <tbody>
+      {% for name, value in r.outputs.items() %}
+      <tr><td class="mono">{{ name }}</td><td class="mono">{{ value|redact }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endfor %}
+
+<h3>Discovery</h3>
+<dl class="kv">
+  <dt>run</dt><dd>{{ evidence.discovery_run_id }}</dd>
+  <dt>model</dt><dd>{{ artifact.created_from.model }}</dd>
+</dl>
+{% if evidence.discovery_files %}
+<ul class="plain">
+  {% for f in evidence.discovery_files %}
+  <li class="mono"><a href="/evidence/{{ f }}">evidence/{{ f }}</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="small muted">No transcript directory found for this run id.</p>
+{% endif %}
+<p class="small muted">{{ evidence.discovery_note }}</p>
+
+<h2>Beneath the rendering</h2>
+<p class="small muted">
+  The plain English above is a rendering. These are the two things it was
+  rendered from.
+</p>
+
+<details class="source">
+  <summary>Artifact source — the compiled capability, what replay executes</summary>
+  <p class="small muted">
+    The file on disk, byte for byte. The content hash covers its
+    execution-affecting fields, so this is what a reviewer would hash.
+  </p>
+  <pre>{{ artifact_source }}</pre>
+</details>
+
+<div class="card" style="margin-top:14px">
+  <div class="card-head">
+    <span class="id">Discovery transcript</span>
+  </div>
+  <p class="small muted">
+    The raw model run this was compiled from, including turns that were
+    pruned. The model emitted a sequence of function calls; the artifact
+    above is what the compiler made of them and what verification proved.
+  </p>
+  {% if transcript.exists %}
+  <ul class="plain">
+    <li><a href="{{ transcript.href }}">{{ transcript.run_id }}/transcript.jsonl</a></li>
+    <li><a href="{{ transcript.rehearse }}">Replay it turn by turn</a>
+      <span class="small muted">— no model, no browser</span></li>
+  </ul>
+  {% else %}
+  <p class="small muted">
+    No transcript on disk for run <code>{{ transcript.run_id }}</code>.
+    The artifact records where it came from; that evidence directory is
+    not in this checkout.
+  </p>
+  {% endif %}
+</div>
+
+<h2>Decision</h2>
+{% if artifact.meta.verified_runs is none %}
+<div class="notice warn">
+  <strong>Approval is blocked.</strong>
+  Cannot approve: verified_runs is not set. Run verification first to prove
+  the artifact replays deterministically. The machine gate runs before the
+  human one, so there is nothing to approve yet.
+</div>
+{% else %}
+<div class="notice info">{{ approval_intro }}</div>
+
+<form method="post" action="/review/{{ entry.key }}/decision" id="decide">
+  <p class="small muted">Check what you actually verified. Each box is an assertion.</p>
+  <div class="checklist">
+    {% for key, label, why in checklist %}
+    <label>
+      <input type="checkbox" name="checked" value="{{ key }}"
+             {% if submitted and key in submitted.checked %}checked{% endif %}>
+      <span>
+        {{ label }}
+        <span class="why-check">{{ why }}</span>
+      </span>
+    </label>
+    {% endfor %}
+  </div>
+
+  <div class="field">
+    <label class="name" for="reviewer">Reviewer<span class="req">required</span></label>
+    <input type="text" id="reviewer" name="reviewer"
+           value="{{ submitted.reviewer if submitted else '' }}"
+           placeholder="D. PARK">
+  </div>
+
+  <div class="field">
+    <label class="name">Role</label>
+    <div class="radios">
+      {% for r in roles %}
+      <label>
+        <input type="radio" name="role" value="{{ r }}"
+               {% if submitted and submitted.role == r %}checked{% elif not submitted and loop.first %}checked{% endif %}>
+        <span>{{ r }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" name="decision" value="approve">Approve</button>
+    <button type="submit" name="decision" value="request_changes" class="secondary"
+            formnovalidate>Request changes</button>
+    <button type="submit" name="decision" value="reject" class="danger"
+            formnovalidate>Reject</button>
+  </div>
+</form>
+<p class="small muted" style="margin-top:14px">
+  Approve records a name and role next to a content hash of the steps,
+  inputs, outputs and outcomes. It is checked on the server, not only in
+  this form. There is no notes field: the artifact stores who approved and
+  against which hash, and a box whose contents were silently discarded
+  would be worse than none.
+</p>
+{% endif %}
+{% endblock %}

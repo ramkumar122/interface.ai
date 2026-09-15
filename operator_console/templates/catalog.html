@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, risk_badge, verified %}
+{% set nav = 'catalog' %}
+{% block title %}Capability catalog — Operator Console{% endblock %}
+{% block content %}
+<h1>Capability catalog</h1>
+<p class="lede">
+  What an operator can run. In production the caller is an AI agent; this
+  screen exists so a human can invoke one on demand and see what it returns.
+</p>
+
+<p class="gate-count">
+  <strong>{{ catalog.approved|length }} approved</strong>
+  {% if catalog.awaiting_review %}
+  &middot; <a href="/review">{{ catalog.awaiting_review|length }} awaiting review &rarr;</a>
+  {% else %}
+  &middot; <span class="muted">none awaiting review</span>
+  {% endif %}
+</p>
+
+{% if not catalog.approved and not catalog.broken %}
+<div class="empty">
+  {% if catalog.awaiting_review %}
+  Nothing is approved yet. {{ catalog.awaiting_review|length }} capability
+  {{ 'is' if catalog.awaiting_review|length == 1 else 'are' }} waiting on a
+  human gate — <a href="/review">review {{ 'it' if catalog.awaiting_review|length == 1 else 'them' }}</a>.
+  {% else %}
+  No artifacts in <code>artifacts/</code>. Discovery writes one after
+  verification passes.
+  {% endif %}
+</div>
+{% endif %}
+
+{% for e in catalog.approved %}
+<div class="card{% if request.query_params.get('approved') == e.key %} just-approved{% endif %}">
+  {% if request.query_params.get('approved') == e.key %}
+  <div class="notice ok" style="margin-bottom:12px">
+    <strong>Approved.</strong> {{ e.artifact.approval.approved_by }} &middot;
+    it can now run unattended.
+    <span class="why">{{ e.artifact.approval.content_hash }}</span>
+  </div>
+  {% endif %}
+  <div class="card-head">
+    <span class="id">{{ e.capability_id }}</span>
+    <span class="badge neutral">v{{ e.version }}</span>
+    {{ status_badge(e.status) }}
+    {{ risk_badge(e.risk_class) }}
+    <span class="card-actions">
+      {% if e.runnable %}
+      <a href="/capability/{{ e.key }}"><button type="button">Run</button></a>
+      {% else %}
+      <button type="button" disabled title="{{ e.run_blocked_reason }}">Run</button>
+      <a href="/review/{{ e.key }}" class="small">Review</a>
+      {% endif %}
+    </span>
+  </div>
+  <p class="small muted" style="margin-bottom:10px">{{ e.artifact.description }}</p>
+  <div class="small">
+    {{ verified(e.verified_runs) }}
+    &middot; {{ e.artifact.steps|length }} steps
+    {% set older = catalog.superseded_count(e) %}
+    {% if older %}
+    &middot; <span class="muted">v{{ e.version }} shown &middot;
+      {{ older }} earlier version{{ '' if older == 1 else 's' }}</span>
+    {% endif %}
+    {% if e.risk_disagrees %}
+    &middot; <span class="badge warn">declared {{ e.risk_class }}, derived {{ e.derived_risk }}</span>
+    {% endif %}
+  </div>
+  {% if not e.runnable %}
+  <div class="notice warn" style="margin:12px 0 0">
+    Run is disabled. {{ e.run_blocked_reason }}
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% for b in catalog.broken %}
+<div class="card">
+  <div class="card-head"><span class="id">{{ b.path.name }}</span>
+    <span class="badge revoked">will not load</span></div>
+  <div class="notice stop">
+    This file is in <code>artifacts/</code> and does not validate against the
+    schema, so nothing can run it. Shown rather than skipped — a reviewer
+    looking for a capability they know exists must not be told it does not.
+    <span class="why">{{ b.error }}</span>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

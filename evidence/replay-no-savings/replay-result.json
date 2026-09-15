@@ -1,0 +1,32 @@
+{
+  "status": "business_outcome",
+  "member_no": "100102",
+  "injection": null,
+  "inject_count": null,
+  "elapsed_s": 1.8,
+  "screenshot": "final-state.png",
+  "outcome_id": "NO_SAVINGS_ACCOUNT",
+  "condition": "Member exists but has no savings share (suffix 0000)",
+  "message": "The member has no primary savings account",
+  "caller_action": "return",
+  "at_step": "read_balance",
+  "steps_completed": [
+    {
+      "step_id": "click_menu",
+      "elapsed_ms": 579.7
+    },
+    {
+      "step_id": "type_member_no",
+      "elapsed_ms": 17.1
+    },
+    {
+      "step_id": "click_search",
+      "elapsed_ms": 582.2
+    },
+    {
+      "step_id": "click_select",
+      "elapsed_ms": 610.3
+    }
+  ],
+  "variant": "no-savings"
+}

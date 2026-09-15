@@ -1,0 +1,49 @@
+{# The per-turn log. Same renderer for a live run and a recording — the
+   transcript format is identical, which is why rehearsal was nearly free. #}
+{% macro turn_log(view, running=false) %}
+<table class="data turnlog">
+  <thead><tr><th>#</th><th>Action</th><th>Target</th><th>Result</th></tr></thead>
+  <tbody>
+    {% for t in view.turns %}
+    <tr class="turn-{{ t.kind }}">
+      <td class="mono">{{ t.ordinal }}</td>
+      <td class="mono">{{ t.action }}{% if t.actor == 'human' %} <span class="badge warn">human</span>{% endif %}</td>
+      <td>
+        <span class="mono">{{ t.target }}</span>
+        {% if t.from_input %}
+        <span class="from-input">&larr; {{ t.from_input }}</span>
+        {% endif %}
+      </td>
+      <td class="small">
+        {% if t.kind == 'refused' %}
+        <span class="badge warn">refused</span> {{ t.detail }}
+        {% elif t.kind == 'failed' %}
+        <span class="badge neutral">no</span> {{ t.outcome }}
+        {% elif t.kind == 'terminal' %}
+        <span class="badge safe">{{ t.action }}</span> {{ t.detail }}
+        {% else %}
+        {{ t.outcome }}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    {% if running %}
+    <tr class="turn-pending">
+      <td class="mono">{{ view.last_ordinal + 1 }}</td>
+      {# On a recording nothing is thinking — saying so would be the one
+         thing rehearsal mode must never imply. #}
+      <td colspan="3" class="small muted">{{
+        "…more turns in the recording" if view.recorded else "thinking…"
+      }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% if view.refusals %}
+<p class="small muted">
+  {{ view.refusals }} action{{ '' if view.refusals == 1 else 's' }} refused by
+  policy. That is the model being told no and adapting — the gate working,
+  not the run failing.
+</p>
+{% endif %}
+{% endmacro %}

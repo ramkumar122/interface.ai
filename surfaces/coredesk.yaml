@@ -1,0 +1,34 @@
+# Per-app surface config for CoreDesk.
+#
+# Why this file exists: in production the target is a vendor's app you cannot
+# edit. If hash-exclusion only worked because we labelled our own header date,
+# the mechanism wouldn't transfer. So exclusions are config, with two matchers.
+#
+#   accessible_name  drop any node whose accessible name equals `value`.
+#                    Used when the target is well-marked. CoreDesk's one-line
+#                    base.html change (aria-label="Current date") makes the
+#                    header date match this cleanly.  This is the matcher that
+#                    fires on CoreDesk.
+#   text_pattern     drop nodes whose text matches the regex within `scope`
+#                    (a landmark/region accessible name).  Used when a vendor
+#                    app has an unlabelled clock we can't re-tag.  Scoped
+#                    tightly to avoid dropping date-bearing *content* nodes
+#                    (e.g. an effective-date field on a form) from the hash —
+#                    scope: "*" would silently make stuck-detection and pruning
+#                    treat two genuinely different states as equal.
+#
+# The text_pattern path is exercised by unit tests against synthetic snapshots
+# (test_text_pattern_fallback_excludes_unlabelled_date, test_text_pattern_
+# respects_scope).  It does NOT fire on CoreDesk's own pages because the header
+# band has no named enclosing region; the accessible_name matcher handles
+# CoreDesk.  A real vendor app whose clock sits inside a named banner would
+# set scope to that banner's accessible name.
+
+name: coredesk
+
+hash_exclusions:
+  - match: accessible_name
+    value: "Current date"
+  - match: text_pattern
+    value: "\\d{2}/\\d{2}/\\d{4}$"
+    scope: "banner"

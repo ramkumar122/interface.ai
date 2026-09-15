@@ -1,0 +1,18 @@
+{
+  "run_id": "discover-gemini-3.6-flash-4a4d7292",
+  "model": "gemini-3.6-flash",
+  "goal": "Find member 100101 and read their primary savings (SAVINGS suffix 0000) available balance.",
+  "status": "done",
+  "steps": 6,
+  "prompt_tokens": 14005,
+  "output_tokens": 158,
+  "seconds": 20.2,
+  "outputs_filled": {
+    "savings_balance": "12,845.50"
+  },
+  "compiled": true,
+  "compile_error": null,
+  "verified": true,
+  "verify_runs": 2,
+  "artifact_path": "artifacts/coredesk.member.read_savings_balance_demo@1.json"
+}

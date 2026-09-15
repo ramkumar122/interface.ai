@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "member_no": "100101",
+  "injection": null,
+  "inject_count": null,
+  "elapsed_s": 1.8,
+  "screenshot": "final-state.png",
+  "outputs": {
+    "savings_balance": "12,845.50"
+  },
+  "drift_signals": [],
+  "steps": [
+    {
+      "step_id": "click_menu",
+      "ref": "e30",
+      "strategy": "ax",
+      "elapsed_ms": 603.2
+    },
+    {
+      "step_id": "type_member_no",
+      "ref": "e29",
+      "strategy": "ax",
+      "elapsed_ms": 16.8
+    },
+    {
+      "step_id": "click_search",
+      "ref": "e36",
+      "strategy": "ax",
+      "elapsed_ms": 595.7
+    },
+    {
+      "step_id": "click_select",
+      "ref": "e41",
+      "strategy": "ax",
+      "elapsed_ms": 613.0
+    },
+    {
+      "step_id": "read_balance",
+      "ref": "e74",
+      "strategy": "ax_relative",
+      "elapsed_ms": 19.0
+    }
+  ],
+  "variant": "success"
+}

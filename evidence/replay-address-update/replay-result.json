@@ -1,0 +1,126 @@
+{
+  "gate": "replay-address-update",
+  "what": "The second write capability, and the first where N-run verification needs no special handling \u2014 setting the same address twice yields the same state and the same output.",
+  "status": "success",
+  "member_no": "100101",
+  "elapsed_s": 3.0,
+  "policy": {
+    "risk_class": "guarded_write",
+    "guarded_write_steps": [
+      "click_confirm_update"
+    ]
+  },
+  "state_change": {
+    "address_before": {
+      "street": "742 Evergreen Ter",
+      "city": "Springfield",
+      "state": "OR",
+      "zip": "97403"
+    },
+    "address_after": {
+      "street": "88 Cedar Lane",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97205"
+    },
+    "changed": true
+  },
+  "audit_row": {
+    "ts": "2026-09-14T15:08:32",
+    "staff_username": "mreyes",
+    "actor": "AUTOMATION",
+    "action": "ADDRESS_UPDATE",
+    "reference": "ADR-30231",
+    "detail": "Address updated, effective 11/01/2026"
+  },
+  "values_are_parameters": {
+    "requested": {
+      "street": "88 Cedar Lane",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97205"
+    },
+    "stored": {
+      "street": "88 Cedar Lane",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97205"
+    },
+    "matches": true,
+    "note": "Discovered with '1216 E Vista Del Cerro Dr, Tempe, AZ 85281'. If `stored` were that rather than `requested`, the address would be baked into the artifact. All six inputs are parameterised, including the effective date \u2014 which was a frozen literal until `review_required` surfaced it in cli review."
+  },
+  "idempotency": {
+    "verify_runs": 3,
+    "note": "Safe at N=2: the same address applied twice is the same state and the same output. card.lock is not idempotent in the same way \u2014 its second run meets an already-locked card \u2014 so this is a property to check per capability, not to assume."
+  },
+  "output_choice": {
+    "returns": "confirmed_city",
+    "not": "the ADR-##### reference",
+    "why": "The reference is generated fresh per run, so a capability returning it could never pass verification's cross-run stability check."
+  },
+  "outputs": {
+    "confirmed_city": "Portland"
+  },
+  "steps": [
+    {
+      "step_id": "click_adrchg",
+      "strategy": "ax",
+      "elapsed_ms": 583.5
+    },
+    {
+      "step_id": "type_member_number",
+      "strategy": "ax",
+      "elapsed_ms": 17.8
+    },
+    {
+      "step_id": "click_search",
+      "strategy": "ax",
+      "elapsed_ms": 592.3
+    },
+    {
+      "step_id": "click_sel",
+      "strategy": "ax",
+      "elapsed_ms": 583.8
+    },
+    {
+      "step_id": "type_address_line_1",
+      "strategy": "ax",
+      "elapsed_ms": 22.6
+    },
+    {
+      "step_id": "type_city",
+      "strategy": "ax",
+      "elapsed_ms": 14.3
+    },
+    {
+      "step_id": "select_state",
+      "strategy": "ax",
+      "elapsed_ms": 12.5
+    },
+    {
+      "step_id": "type_zip_code",
+      "strategy": "ax",
+      "elapsed_ms": 10.7
+    },
+    {
+      "step_id": "type_effective_date",
+      "strategy": "ax",
+      "elapsed_ms": 10.5
+    },
+    {
+      "step_id": "click_continue",
+      "strategy": "ax",
+      "elapsed_ms": 585.0
+    },
+    {
+      "step_id": "read_confirmed_city",
+      "strategy": "ax_relative",
+      "elapsed_ms": 18.3
+    },
+    {
+      "step_id": "click_confirm_update",
+      "strategy": "ax",
+      "elapsed_ms": 553.4
+    }
+  ]
+}

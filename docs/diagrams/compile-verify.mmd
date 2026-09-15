@@ -1,0 +1,52 @@
+%%{init: {'theme':'dark'}}%%
+sequenceDiagram
+    autonumber
+    participant CLI as run_discover.py
+    participant C as compile.py
+    participant P as prune.py
+    participant S as schema.py
+    participant V as verify.py
+    participant E as engine.py
+    participant A as artifacts JSON
+
+    CLI->>C: compile_transcript
+    C->>P: prune records
+    Note over P: Shortest path through hashes. Writes are kept.
+    P-->>C: kept StepRecords
+    C->>C: parameterize declared inputs
+    C->>C: locator ladder ax, ax_relative, ax_scoped
+    C->>C: infer wait_for structurally, never a runtime value
+    C->>C: record_data_violations over six generated fields
+    C->>S: CapabilityArtifact validate
+    S-->>C: draft artifact
+    C-->>CLI: artifact
+
+    alt compile refused
+        CLI->>CLI: no file written
+    else compile ok
+        CLI->>V: verify_artifact inputs plus also second set
+        alt has declared inputs and no second set
+            V-->>CLI: refused, determinism is not portability
+        else
+            loop n times, first parameter set
+                V->>E: replay mode DISCOVERY
+                Note over E: No Gemini. Follows compiled steps.
+                E-->>V: ReplaySuccess outputs
+                V->>V: outputs equal WITHIN the set
+            end
+            loop once per further parameter set
+                V->>E: replay mode DISCOVERY
+                E-->>V: ReplaySuccess outputs
+                V->>V: succeeded and every declared output filled
+                Note over V: Outputs are NOT compared across sets.
+            end
+        end
+        alt every set passed
+            V->>V: stamp verified_runs, total runs across all sets
+            V-->>CLI: passed true
+            CLI->>A: write artifact JSON
+        else any set failed
+            V-->>CLI: passed false
+            CLI->>CLI: do not write file
+        end
+    end

@@ -1,0 +1,18 @@
+{
+  "run_id": "discover-gemini-3.6-flash-4357e668",
+  "model": "gemini-3.6-flash",
+  "goal": "edit address to the member nuunber in the input and out the address you have edited",
+  "status": "done",
+  "steps": 15,
+  "prompt_tokens": 49224,
+  "output_tokens": 406,
+  "seconds": 32.4,
+  "outputs_filled": {
+    "address": "1216 E Vista del Cerro Dr"
+  },
+  "compiled": false,
+  "compile_error": "step 14: cannot locate cell \"1216 E Vista del Cerro Dr\" in frame \"main\": its accessible name is the value it reads ('1216 E Vista del Cerro Dr'), and no table context or named region offers a structural alternative",
+  "verified": false,
+  "verify_runs": 0,
+  "artifact_path": null
+}

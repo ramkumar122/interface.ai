@@ -1,149 +1,167 @@
-# CoreDesk (mock)
+# Computer-use automation for CoreDesk
 
-CoreDesk is a mock legacy credit-union servicing web app. It intentionally
-looks and behaves like enterprise software written around 2006 and patched
-since: full-page loads, nested-table layout, server-rendered HTML only, and
-ASP.NET WebForms-style element ids. It is used as the target application for a
-computer-use automation exercise.
+Two programs in one repo:
 
-FastAPI is used strictly as an HTML page server. There are **no** JSON
-endpoints, no client-side routing, and no JavaScript.
+1. **CoreDesk** — a mock legacy credit-union servicing app (the target).
+   Nested tables, ASP.NET-style ids, no JSON API, two tenant configs of
+   the same product.
+2. **The automation system** — an LLM discovers how to complete a goal
+   once, compiles a versioned capability artifact, and **replays that
+   artifact with no model in the decision loop**.
 
-## Stack
+> The model discovers. The artifact becomes a reusable capability.
+> Deterministic replay is how an AI agent invokes it in production.
 
-- Python 3.12
-- FastAPI + Uvicorn (HTML page server only)
-- Jinja2 templates
-- Plain CSS (one stylesheet)
-- SQLite via the stdlib `sqlite3` (no ORM). All money is stored as INTEGER
-  CENTS and rendered through `db/money.py`; no floats anywhere in the money path.
+## Setup
 
-## Multi-tenant
-
-The same codebase serves two tenants, selected by the `TENANT` environment
-variable:
-
-| Tenant      | Key         | Port | Institution                    | Accent |
-|-------------|-------------|------|--------------------------------|--------|
-| A           | `riverbend` | 8001 | Riverbend Credit Union         | navy   |
-| B           | `summit`    | 8002 | Summit Federal Credit Union    | maroon |
-
-All tenant-specific values live in `coredesk/config.py`; templates hardcode
-nothing.
-
-## Project layout
-
-```
-run_coredesk.py     starts one tenant; TENANT and PORT from env
-reset_db.py         drop, create, seed, print summary
-coredesk/           the target app (routes, config, session, templates, static)
-db/                 schema, fixtures, connection, queries (only SQL lives here), money
-tests/              pytest suite
-```
-
-The target app under `coredesk/` is self-contained and does not know it is
-being automated. `agent/`, `replay/`, `control/`, `artifacts/`, and `evidence/`
-are placeholders for later tasks.
-
-## Install
-
-Requires Python 3.12.
+Python 3.12.
 
 ```bash
-cd "Computer-Use Automation"
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## Database
-
-Sign-on and all member data are backed by a single SQLite file, `coredesk.db`,
-at the repo root. Both tenants share this one file; tenant differences are
-presentation only.
-
-Build (or rebuild) it before running the app:
-
-```bash
-source .venv/bin/activate
+playwright install chromium     # ~275 MB, once
 python reset_db.py
 ```
 
-`reset_db.py` drops the file, recreates the schema (`db/schema.sql`), seeds the
-fixtures (`db/fixtures.py`), and prints a summary (row counts plus the 20
-seeded members with status, share count, and card count). It is idempotent:
-running it twice produces identical data.
-
-Data-layer layout:
-
-- `db/schema.sql` — DDL (tables + indexes)
-- `db/fixtures.py` — seed data as readable Python literals
-- `db/connection.py` — connection helper (row factory + foreign keys ON)
-- `db/queries.py` — all SQL (reads, writes, seed); returns typed rows
-- `db/money.py` — `cents_to_display` / `display_to_cents`
-
-Passwords are hashed with stdlib PBKDF2-HMAC-SHA256 (per-user salt stored in
-the hash string). No bcrypt/passlib dependency.
-
-## Tests
+Discovery needs a model; replay does not.
 
 ```bash
-source .venv/bin/activate
-pytest
+export GOOGLE_API_KEY=...        # https://aistudio.google.com/apikey
 ```
 
-Tests run against a throwaway database (via the `COREDESK_DB` environment
-variable) and never touch `coredesk.db`.
+A repo-root `.env` is loaded if present (gitignored). **Never commit a key.**
 
-## Run both tenants (two terminals)
+| Variable | Default | Purpose |
+|---|---|---|
+| `GOOGLE_API_KEY` | — | Discovery only. Replay never reads it. |
+| `GEMINI_MODEL` | `gemini-3.6-flash` | Discovery model |
+| `TENANT` / `PORT` | `riverbend` / `8001` | Which CoreDesk to start |
+| `COREDESK_USER` / `COREDESK_PASS` | `mreyes` / `demo1234` | Harness sign-in (never sent to the model) |
+| `COREDESK_DB` | `coredesk.db` | SQLite path (tests use a temp file) |
 
-Terminal 1 — Tenant A (Riverbend, navy) on port 8001:
+Demo logins: `mreyes` (MSR), `jtran` (TELLER_RO), `dpark` (SUPERVISOR).
+Password for all three: `demo1234`.
+
+## Run it
+
+Two terminals:
 
 ```bash
-source .venv/bin/activate
-TENANT=riverbend PORT=8001 python run_coredesk.py
+make coredesk     # the target app  → http://127.0.0.1:8001
+make console      # the operator UI → http://127.0.0.1:8010
 ```
 
-Terminal 2 — Tenant B (Summit, maroon) on port 8002:
+A third, only for the cross-tenant demo:
 
 ```bash
-source .venv/bin/activate
-TENANT=summit PORT=8002 python run_coredesk.py
+make coredesk-summit    # → http://127.0.0.1:8002
 ```
 
-Then open:
+## What to look at
 
-- http://127.0.0.1:8001/  (Riverbend)
-- http://127.0.0.1:8002/  (Summit)
+Visit these in order. **The order is the architecture**: language goes in at
+discovery, typed parameters go in at invocation, and a human gate sits
+between them.
 
-`TENANT` and `PORT` both default to `riverbend` / `8001` when unset. If you set
-`TENANT=summit` without a `PORT`, it defaults to `8002`.
+**1. `/discover`** — the natural-language entry point. Type a goal; a model
+works out how to do it, once. Ends at compile → verify → draft.
 
-## Demo logins
+**2. `/review`** — the human gate. The steps in plain English, a checklist
+that explains what to check, and the artifact source byte for byte. Nothing
+runs unattended until this passes.
 
-| User ID  | Password   | Display   | Role        | Branch |
-|----------|------------|-----------|-------------|--------|
-| `mreyes` | `demo1234` | M. REYES  | MSR         | 001    |
-| `jtran`  | `demo1234` | J. TRAN   | TELLER_RO   | 004    |
-| `dpark`  | `demo1234` | D. PARK   | SUPERVISOR  | 001    |
+**3. `/`** — the catalog. Approved capabilities only. Pick one, fill the
+typed inputs, Run.
 
-## Configuration
+Two capabilities are approved. `read_savings_balance` reads.
+`update_address` writes — it changes a member's address and returns the
+confirmed value, and it was verified against two members in different
+cities, so it works for records other than the one it was recorded from.
 
-- `COREDESK_SECRET` — secret used to sign the session cookie. A development
-  default is used when unset; set a real value for any non-local use.
-- `COREDESK_DB` — path to the SQLite file. Defaults to `coredesk.db` at the
-  repo root. Tests set this to a temporary file.
+Two notes:
 
-## Navigation
+- No API key? `/discover/rehearse` replays a saved discovery run turn by
+  turn, with no model and no browser.
+- To see the escalation handoff: start a run, toggle `session_expired` at
+  http://127.0.0.1:8001/admin/inject while it is in flight, sign in by hand
+  in the browser window, then press **Resume** in the console.
 
-- `GET /` — sign-on. Redirects to `/menu` if already signed on.
-- `POST /signon` — validates credentials, sets a signed session cookie, and
-  redirects to `/menu`. On failure it redirects back to `/?err=1` without
-  revealing which field was wrong.
-- `GET /menu` — the main menu (requires a session).
-- `POST /menu` — fast-path box: enter a function code (case-insensitive) to
-  jump straight to that screen; unknown codes re-render the menu with an error.
-- `GET /signoff` — clears the session and returns to sign-on.
-- Function screens (`/mbrinq`, `/member/cards`, `/member/address`,
-  `/member/shares/new`, `/member/transactions`) are stubs for now and show
-  "FUNCTION NOT YET IMPLEMENTED".
+To put something in the review queue: `make seed-draft`.
+
+## Without the browser
+
+```bash
+make test
+```
+
+Browser tests are marked `live` and skip loudly when Chromium or CoreDesk is
+missing. Replay tests unset the API key and inject a client that raises on
+call.
+
+```bash
+make test-live    # the live ones, for real (needs CoreDesk on :8001)
+```
+
+## Terminal equivalents
+
+The same operations without the console.
+
+```bash
+# Discover a capability. Verification needs a second parameter set — the
+# same values twice prove determinism, not that it works for another
+# record. --verify-runs is replays per set; verified_runs counts them all.
+python scripts/run_discover.py \
+  --goal "Find member 100101 and read their primary savings (SAVINGS suffix 0000) available balance." \
+  --target "http://127.0.0.1:8001/menu" \
+  --inputs '{"member_no": "100101"}' \
+  --verify-inputs-2 '{"member_no": "100110"}' \
+  --outputs '{"savings_balance": "money"}' \
+  --capability-id coredesk.member.read_savings_balance \
+  --verify-runs 2
+
+# Replay the shipped artifact — no API key, no model.
+python scripts/replay_evidence.py --variant success
+
+# Other outcomes from the same artifact.
+python scripts/replay_evidence.py --variant business-outcome   # 999999 → MEMBER_NOT_FOUND
+python scripts/replay_evidence.py --variant no-savings         # 100102 → NO_SAVINGS_ACCOUNT
+python scripts/replay_evidence.py --variant failure            # app_error
+python scripts/replay_evidence.py --variant db-timeout         # recovery, visible in the trace
+python scripts/replay_evidence.py --variant session-expired    # escalation
+python scripts/replay_evidence.py --variant determinism        # three members, one artifact
+
+# A write that completes, verified across two members.
+python scripts/address_update_evidence.py
+
+# Review and approve.
+python -m control review artifacts/coredesk.member.read_savings_balance@1.json
+
+# Same artifact, two tenants (needs Summit on :8002).
+python scripts/cross_tenant_evidence.py
+```
+
+Set `HEADLESS=1` on any of these for CI or unattended runs.
+
+`docs/REGENERATE_EVIDENCE.md` rebuilds `evidence/` from scratch.
+
+## Layout
+
+```
+README.md  REPORT.md  evidence/     graded locations — do not rename
+artifacts/                          versioned capability JSON
+agent/                              discovery (LLM). Never imports playwright.
+operator_console/                   the reviewer's UI on :8010. Imports no coredesk.
+replay/                             production path. Never imports google.genai.
+surface/                            the only Playwright import
+control/                            policy, approval, ownership, escalation
+coredesk/  db/                      the target app. Imports none of the above.
+scripts/                            harnesses (sign-in, evidence, CLI)
+```
+
+## Further reading
+
+- `REPORT.md` — design write-up (seven fixed headings)
+- `evidence/README.md` — which run to open, and why
+- `docs/REGENERATE_EVIDENCE.md` — how to rebuild `evidence/` from a clean database
+- `docs/diagrams/` — the three sequence diagrams, with mermaid sources

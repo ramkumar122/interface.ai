@@ -1,0 +1,13 @@
+{
+  "run_id": "discover-gemini-3.6-flash-65b48ef0",
+  "model": "gemini-3.6-flash",
+  "goal": "Find member 100101 and read their primary savings (SAVINGS suffix 0000) available balance.",
+  "status": "done",
+  "steps": 6,
+  "prompt_tokens": 13955,
+  "output_tokens": 154,
+  "seconds": 9.3,
+  "outputs_filled": {
+    "savings_balance": "12,845.50"
+  }
+}

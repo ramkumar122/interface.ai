@@ -1,0 +1,52 @@
+{
+  "gate": "escalation-resume",
+  "phase_1_escalation": {
+    "status": "escalated",
+    "step_id": "click_menu",
+    "reason": "detected: session_expired",
+    "instructions": "The session has expired. Please sign in again as the current operator. Then navigate to the correct screen (step: 'Click the Member Inquiry menu link to open the member search screen'). Parameters: member_no=100101.",
+    "resume_token": "escalation-gate:click_menu:1",
+    "elapsed_s": 0.1
+  },
+  "phase_2_ownership_check": {
+    "act_rejected": true,
+    "reason": "not_owner"
+  },
+  "phase_3_human_signin": {
+    "url_after_signin": "http://127.0.0.1:8001/member/100101"
+  },
+  "phase_4_resume": {
+    "status": "success",
+    "outputs": {
+      "savings_balance": "12,845.50"
+    },
+    "steps": [
+      {
+        "step_id": "click_menu",
+        "strategy": "ax",
+        "elapsed_ms": 546.5
+      },
+      {
+        "step_id": "type_member_no",
+        "strategy": "ax",
+        "elapsed_ms": 19.9
+      },
+      {
+        "step_id": "click_search",
+        "strategy": "ax",
+        "elapsed_ms": 583.2
+      },
+      {
+        "step_id": "click_select",
+        "strategy": "ax",
+        "elapsed_ms": 610.2
+      },
+      {
+        "step_id": "read_balance",
+        "strategy": "ax_relative",
+        "elapsed_ms": 19.1
+      }
+    ],
+    "elapsed_s": 1.8
+  }
+}

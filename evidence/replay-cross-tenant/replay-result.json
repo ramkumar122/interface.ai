@@ -1,0 +1,82 @@
+{
+  "gate": "cross-tenant",
+  "artifact": "coredesk.member.read_savings_balance@1",
+  "expected_balance": "12,845.50",
+  "both_succeeded": true,
+  "runs": [
+    {
+      "tenant": "riverbend",
+      "origin": "http://127.0.0.1:8001",
+      "status": "success",
+      "elapsed_s": 1.8,
+      "screenshot": "riverbend-final.png",
+      "outputs": {
+        "savings_balance": "12,845.50"
+      },
+      "steps": [
+        {
+          "step_id": "click_menu",
+          "strategy": "ax",
+          "elapsed_ms": 565.1
+        },
+        {
+          "step_id": "type_member_no",
+          "strategy": "ax",
+          "elapsed_ms": 13.3
+        },
+        {
+          "step_id": "click_search",
+          "strategy": "ax",
+          "elapsed_ms": 581.4
+        },
+        {
+          "step_id": "click_select",
+          "strategy": "ax",
+          "elapsed_ms": 611.7
+        },
+        {
+          "step_id": "read_balance",
+          "strategy": "ax_relative",
+          "elapsed_ms": 19.4
+        }
+      ]
+    },
+    {
+      "tenant": "summit",
+      "origin": "http://127.0.0.1:8002",
+      "status": "success",
+      "elapsed_s": 1.8,
+      "screenshot": "summit-final.png",
+      "outputs": {
+        "savings_balance": "12,845.50"
+      },
+      "steps": [
+        {
+          "step_id": "click_menu",
+          "strategy": "ax",
+          "elapsed_ms": 580.4
+        },
+        {
+          "step_id": "type_member_no",
+          "strategy": "ax",
+          "elapsed_ms": 17.6
+        },
+        {
+          "step_id": "click_search",
+          "strategy": "ax",
+          "elapsed_ms": 582.5
+        },
+        {
+          "step_id": "click_select",
+          "strategy": "ax",
+          "elapsed_ms": 605.8
+        },
+        {
+          "step_id": "read_balance",
+          "strategy": "ax_relative",
+          "elapsed_ms": 18.5
+        }
+      ]
+    }
+  ]
+}

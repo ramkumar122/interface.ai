@@ -1,0 +1,73 @@
+{# Screen 4. Renders InterventionRequest and nothing else. #}
+{% macro intervention(state, request_obj, resume_token) %}
+<div class="intervention">
+  <div class="notice stop">
+    <strong>The automation has stopped and needs a person.</strong>
+    {# `reason` is the detector's own string. On the page-text path that is
+       `detected: <id>` — an identifier, not a sentence — so it is labelled
+       as the detector that fired rather than presented as prose. The
+       sentence a person needs is `instructions`, below. #}
+    <span class="why">detector: {{ request_obj.reason }}</span>
+  </div>
+
+  <div class="handoff">
+    <div class="ownership">
+      <span class="own-label">Session ownership</span>
+      <div class="own-states">
+        {% for who in ['AUTOMATION', 'HUMAN', 'NONE'] %}
+        <span class="own {{ 'on' if state.owner == who }}">{{ who }}</span>
+        {% endfor %}
+      </div>
+      {% if state.escalated_at_step %}
+      <p class="small muted">
+        AUTOMATION released to HUMAN at step
+        <code>{{ state.escalated_at_step }}</code>. While ownership is HUMAN,
+        <code>Surface.act()</code> refuses with <code>not_owner</code> — the
+        agent cannot touch the page you are working in.
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="notice info">
+      <strong>Act in the Playwright browser window, not here.</strong>
+      That window is live and interactive. Do what the instructions below
+      describe, then come back and press Resume. This console shows you what
+      is needed and carries the Resume signal; it is not a remote control and
+      does not mirror the page.
+    </div>
+  </div>
+
+  <h3>What to do</h3>
+  <p class="instructions">{{ request_obj.instructions }}</p>
+
+  <dl class="kv">
+    <dt>capability</dt><dd>{{ request_obj.capability_id }}</dd>
+    <dt>stopped at</dt><dd>{{ request_obj.step_id }}</dd>
+    <dt>step intent</dt><dd>{{ request_obj.step_intent }}</dd>
+    <dt>current url</dt><dd>{{ request_obj.current_url }}</dd>
+    <dt>raised</dt><dd>{{ request_obj.created_at }}</dd>
+    <dt>resume token</dt><dd>{{ resume_token }}</dd>
+  </dl>
+  <p class="small muted">
+    The resume token is opaque. It is shown for logs; Resume passes the
+    result object back to <code>engine.resume()</code> and never parses it.
+  </p>
+
+  {% if request_obj.screenshot_path %}
+  <h3>What the page looked like</h3>
+  <img class="shot" src="/evidence/{{ state.run_id }}/{{ request_obj.screenshot_path.split('/')|last }}"
+       alt="The page when the automation stopped">
+  {% endif %}
+
+  <form method="post" action="/run/{{ state.run_id }}/resume">
+    <div class="button-row">
+      <button type="submit">Resume</button>
+      <span class="small muted">
+        Reacquires the browser, re-validates that the step's target is
+        findable, and continues. If the page is not where the step needs it,
+        Resume fails with a diagnostic rather than acting blindly.
+      </span>
+    </div>
+  </form>
+</div>
+{% endmacro %}

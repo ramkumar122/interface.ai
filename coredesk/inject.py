@@ -101,6 +101,13 @@ def _splice_after_body(html, snippet):
 
 class InjectionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
+        # Propagate the actor header so audit writes distinguish
+        # AUTOMATION from HUMAN.  Default is HUMAN when absent.
+        actor = request.headers.get("x-coredesk-actor", "HUMAN")
+        if actor not in ("HUMAN", "AUTOMATION"):
+            actor = "HUMAN"
+        request.state.actor = actor
+
         path = request.url.path
         if path.startswith("/admin") or path.startswith("/static"):
             request.state.inject = None

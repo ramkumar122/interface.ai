@@ -1,0 +1,31 @@
+{
+  "variant": "wrong-value",
+  "passed": false,
+  "failure_summary": "run 1/1 failed: read_savings_balance: 'OPEN' is not valid money (cannot parse as money: 'OPEN')",
+  "runs": 1,
+  "run_details": [
+    {
+      "status": "failure",
+      "error": "read_savings_balance: 'OPEN' is not valid money (cannot parse as money: 'OPEN')",
+      "step_id": "read_savings_balance",
+      "steps": [
+        {
+          "step_id": "click_mbrinq",
+          "elapsed_ms": 598.5
+        },
+        {
+          "step_id": "type_member_number",
+          "elapsed_ms": 20.0
+        },
+        {
+          "step_id": "click_search",
+          "elapsed_ms": 592.6
+        },
+        {
+          "step_id": "click_sel",
+          "elapsed_ms": 609.6
+        }
+      ]
+    }
+  ]
+}

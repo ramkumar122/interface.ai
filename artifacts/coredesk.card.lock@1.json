@@ -1,0 +1,434 @@
+{
+  "capability_id": "coredesk.card.lock",
+  "version": "1.0",
+  "description": "Find the member, open their card maintenance screen, lock the VISA debit card using the given reason, then return to the Cards list and read the STATUS column for that card.",
+  "surface_id": "coredesk",
+  "created_from": {
+    "run_id": "discover-gemini-3.6-flash-6d1dec0b",
+    "model": "gemini-3.6-flash",
+    "steps_in_transcript": 11,
+    "wall_seconds": 17.7
+  },
+  "inputs": [
+    {
+      "name": "member_no",
+      "type": "string",
+      "description": "Declared input: member_no",
+      "example": "100101"
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "description": "Declared input: reason",
+      "example": "Suspected fraud"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "card_status",
+      "type": "text",
+      "shape": "Value of type text",
+      "description": "Declared output: card_status"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "click_crdmnt",
+      "ordinal": 1,
+      "intent": "Click link \"CRDMNT\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "CRDMNT",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "type_member_number",
+      "ordinal": 2,
+      "intent": "Type member_no into textbox \"Member Number\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "member_no",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtMemberNo",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_search",
+      "ordinal": 3,
+      "intent": "Click button \"Search\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Search",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_sel",
+      "ordinal": 4,
+      "intent": "Click link \"SEL\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "MAINT"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_maint",
+      "ordinal": 5,
+      "intent": "Click link \"MAINT\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "MAINT",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "radio",
+        "name": "Lock"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_lock",
+      "ordinal": 6,
+      "intent": "Click radio \"Lock\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "radio",
+        "name": "Lock",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "combobox",
+        "name": "Reason"
+      },
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_rdoLock",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "select_reason",
+      "ordinal": 7,
+      "intent": "Select combobox \"Reason\"",
+      "action": "select",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "combobox",
+        "name": "Reason",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "reason",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_selReason",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_apply",
+      "ordinal": 8,
+      "intent": "Click button \"Apply\"",
+      "action": "click",
+      "risk": "guarded_write",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Apply",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "Cancel"
+      },
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_btnApply",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_cancel",
+      "ordinal": 9,
+      "intent": "Click link \"Cancel\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "Cancel",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "cell",
+        "name": "LOCKED"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "read_card_status",
+      "ordinal": 10,
+      "intent": "Read the cell under column \"STATUS\" in table \"Cards on file\" into card_status",
+      "action": "read",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax_relative",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "cell",
+        "name": null,
+        "within": null,
+        "table_name": "Cards on file",
+        "column_header": "STATUS",
+        "row_key": "CRD-100101-1",
+        "row_match": "exact"
+      },
+      "value": {
+        "source": "output",
+        "input_name": null,
+        "literal": null,
+        "output_name": "card_status",
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "ax",
+          "value": "LOCKED",
+          "reason": "the accessible name is the value this step reads, so the locator would only resolve for the record it was recorded against"
+        }
+      ]
+    }
+  ],
+  "known_outcomes": [],
+  "checkpoint": {
+    "description": "Located member 100101, opened card maintenance for the VISA debit card, locked the card with reason 'Suspected fraud', returned to the Cards list, and read STATUS as LOCKED.",
+    "evidence_refs": [
+      "card_status"
+    ],
+    "proposed_by": "compiler"
+  },
+  "recoverables": [],
+  "overrides": {},
+  "escalation_policy": {
+    "on_stuck": "Escalate to human operator",
+    "on_unknown_state": "Escalate immediately",
+    "on_blocked": "Return policy_blocked outcome"
+  },
+  "approval": {
+    "status": "revoked",
+    "approved_by": "D. PARK — Risk / Ops",
+    "approved_at": "2026-09-14T01:46:57.979489+00:00",
+    "risk_class": "guarded_write",
+    "content_hash": null
+  },
+  "meta": {
+    "schema_version": "1.0",
+    "compiler_version": "0.1",
+    "verified_runs": 2
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status": "failure",
+  "member_no": "100101",
+  "injection": "app_error",
+  "inject_count": null,
+  "elapsed_s": 10.6,
+  "screenshot": "final-state.png",
+  "step_id": "click_menu",
+  "step_intent": "Click the Member Inquiry menu link to open the member search screen",
+  "expected": "no hard failure condition",
+  "observed": "detected: APP_ERROR",
+  "locator_rung": "",
+  "error": "hard failure detected: APP_ERROR",
+  "steps_completed": [],
+  "variant": "failure"
+}
