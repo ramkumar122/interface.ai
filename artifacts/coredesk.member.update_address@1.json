@@ -1,0 +1,519 @@
+{
+  "capability_id": "coredesk.member.update_address",
+  "version": "1.0",
+  "description": "Find the member, open their address maintenance screen, enter the given street, city, state, ZIP and effective date, continue to the review screen, read the NEW value of the City row from the Address change review table, then confirm the update and stop.",
+  "surface_id": "coredesk",
+  "created_from": {
+    "run_id": "discover-gemini-3.6-flash-54408e12",
+    "model": "gemini-3.6-flash",
+    "steps_in_transcript": 13,
+    "wall_seconds": 22.1
+  },
+  "inputs": [
+    {
+      "name": "member_no",
+      "type": "string",
+      "description": "Declared input: member_no",
+      "example": "100101"
+    },
+    {
+      "name": "street",
+      "type": "string",
+      "description": "Declared input: street",
+      "example": "1216 E Vista Del Cerro Dr"
+    },
+    {
+      "name": "city",
+      "type": "string",
+      "description": "Declared input: city",
+      "example": "Tempe"
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "description": "Declared input: state",
+      "example": "AZ"
+    },
+    {
+      "name": "zip",
+      "type": "string",
+      "description": "Declared input: zip",
+      "example": "85281"
+    },
+    {
+      "name": "effective_date",
+      "type": "string",
+      "description": "Declared input: effective_date",
+      "example": "10/01/2026"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmed_city",
+      "type": "text",
+      "shape": "Value of type text",
+      "description": "Declared output: confirmed_city"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "click_adrchg",
+      "ordinal": 1,
+      "intent": "Click link \"ADRCHG\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "ADRCHG",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "type_member_number",
+      "ordinal": 2,
+      "intent": "Type member_no into textbox \"Member Number\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "member_no",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtMemberNo",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_search",
+      "ordinal": 3,
+      "intent": "Click button \"Search\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Search",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_sel",
+      "ordinal": 4,
+      "intent": "Click link \"SEL\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Address Line 1"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "type_address_line_1",
+      "ordinal": 5,
+      "intent": "Type street into textbox \"Address Line 1\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Address Line 1",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "street",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtLine1",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "type_city",
+      "ordinal": 6,
+      "intent": "Type city into textbox \"City\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "City",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "city",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtCity",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "select_state",
+      "ordinal": 7,
+      "intent": "Select combobox \"State\"",
+      "action": "select",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "combobox",
+        "name": "State",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "state",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_selState",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "type_zip_code",
+      "ordinal": 8,
+      "intent": "Type zip into textbox \"ZIP Code\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "ZIP Code",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "zip",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtZip",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "type_effective_date",
+      "ordinal": 9,
+      "intent": "Type effective_date into textbox \"Effective Date\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Effective Date",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "effective_date",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtEff",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_continue",
+      "ordinal": 10,
+      "intent": "Click button \"Continue\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Continue",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "table",
+        "name": "Address change review"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "read_confirmed_city",
+      "ordinal": 11,
+      "intent": "Read the cell under column \"NEW\" in table \"Address change review\" into confirmed_city",
+      "action": "read",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax_relative",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "cell",
+        "name": null,
+        "within": null,
+        "table_name": "Address change review",
+        "column_header": "NEW",
+        "row_key": "City",
+        "row_match": "exact"
+      },
+      "value": {
+        "source": "output",
+        "input_name": null,
+        "literal": null,
+        "output_name": "confirmed_city",
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "ax",
+          "value": "Tempe",
+          "reason": "the accessible name is the value this step reads, so the locator would only resolve for the record it was recorded against"
+        }
+      ]
+    },
+    {
+      "step_id": "click_confirm_update",
+      "ordinal": 12,
+      "intent": "Click button \"Confirm Update\"",
+      "action": "click",
+      "risk": "guarded_write",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Confirm Update",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": null,
+      "rejected": []
+    }
+  ],
+  "known_outcomes": [],
+  "checkpoint": {
+    "description": "Successfully navigated to member 100101's address maintenance screen, entered the updated address details (1216 E Vista Del Cerro Dr, Tempe, AZ, 85281, effective 10/01/2026), reviewed the change, read the NEW City value ('Tempe') from the Address change review table into confirmed_city, and confirmed the update.",
+    "evidence_refs": [
+      "confirmed_city"
+    ],
+    "proposed_by": "compiler"
+  },
+  "recoverables": [],
+  "overrides": {},
+  "escalation_policy": {
+    "on_stuck": "Escalate to human operator",
+    "on_unknown_state": "Escalate immediately",
+    "on_blocked": "Return policy_blocked outcome"
+  },
+  "approval": {
+    "status": "approved",
+    "approved_by": "D. PARK — Risk / Ops",
+    "approved_at": "2026-09-14T18:10:58.081708+00:00",
+    "risk_class": "guarded_write",
+    "content_hash": "sha256:4b344cd728783da99b7fa68bd798c2ce272a7ea5cc4839e8a6e5c6184b8f5cda"
+  },
+  "meta": {
+    "schema_version": "1.0",
+    "compiler_version": "0.1",
+    "verified_runs": 3
+  }
+}

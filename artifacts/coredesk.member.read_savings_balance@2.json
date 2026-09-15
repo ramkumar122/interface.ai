@@ -1,0 +1,238 @@
+{
+  "capability_id": "coredesk.member.read_savings_balance",
+  "version": "2.0",
+  "description": "Read the available balance of a member's primary savings account (suffix 0000). Compiled from the discovery transcript and pending review.",
+  "surface_id": "coredesk",
+  "created_from": {
+    "run_id": "discover-gemini-3.6-flash-65b48ef0",
+    "model": "gemini-3.6-flash",
+    "steps_in_transcript": 6,
+    "wall_seconds": 9.3
+  },
+  "inputs": [
+    {
+      "name": "member_no",
+      "type": "string",
+      "description": "Declared input: member_no",
+      "example": "100101"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savings_balance",
+      "type": "money",
+      "shape": "Value of type money",
+      "description": "Declared output: savings_balance"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "click_mbrinq",
+      "ordinal": 1,
+      "intent": "Click link \"MBRINQ\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "MBRINQ",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "type_member_number",
+      "ordinal": 2,
+      "intent": "Type member_no into textbox \"Member Number\"",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "member_no",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtMemberNo",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_search",
+      "ordinal": 3,
+      "intent": "Click button \"Search\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Search",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_sel",
+      "ordinal": 4,
+      "intent": "Click link \"SEL\"",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "role_name",
+          "value": null,
+          "role": "iframe",
+          "name_prefix": "Share accounts for member"
+        },
+        "role": "table",
+        "name": "Share accounts"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "read_savings_balance",
+      "ordinal": 5,
+      "intent": "Read the cell under column \"AVAILABLE\" in table \"Share accounts\" into savings_balance",
+      "action": "read",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax_relative",
+        "frame": {
+          "match": "role_name",
+          "value": null,
+          "role": "iframe",
+          "name_prefix": "Share accounts for member"
+        },
+        "role": "cell",
+        "name": null,
+        "within": null,
+        "table_name": "Share accounts",
+        "column_header": "AVAILABLE",
+        "row_key": "0000",
+        "row_match": "exact"
+      },
+      "value": {
+        "source": "output",
+        "input_name": null,
+        "literal": null,
+        "output_name": "savings_balance",
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "ax",
+          "value": "12,845.50",
+          "reason": "the accessible name is the value this step reads, so the locator would only resolve for the record it was recorded against"
+        }
+      ]
+    }
+  ],
+  "known_outcomes": [],
+  "checkpoint": {
+    "description": "Found member 100101 and read primary savings (suffix 0000) available balance of 12,845.50 into savings_balance output.",
+    "evidence_refs": [
+      "savings_balance"
+    ],
+    "proposed_by": "compiler"
+  },
+  "recoverables": [],
+  "overrides": {},
+  "escalation_policy": {
+    "on_stuck": "Escalate to human operator",
+    "on_unknown_state": "Escalate immediately",
+    "on_blocked": "Return policy_blocked outcome"
+  },
+  "approval": {
+    "status": "approved",
+    "approved_by": "D. PARK — Risk / Ops",
+    "approved_at": "2026-09-15T05:28:24.584678+00:00",
+    "risk_class": "safe",
+    "content_hash": "sha256:cb3082b931b652fbafd824395b83e6a4659bdb98dbefa2e10452e429cbe3b9b9"
+  },
+  "meta": {
+    "schema_version": "1.0",
+    "compiler_version": "0.1",
+    "verified_runs": 3
+  }
+}

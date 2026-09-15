@@ -1,0 +1,369 @@
+{
+  "capability_id": "coredesk.member.read_savings_balance",
+  "version": "1.0",
+  "description": "Read the available balance of a member's primary savings account (suffix 0000). Navigates to the member record via member number, locates the savings share in the shares table, and reads the AVAILABLE column value.",
+  "surface_id": "coredesk",
+  "created_from": {
+    "run_id": "discover-gemini-3.6-flash-65b48ef0",
+    "model": "gemini-3.6-flash",
+    "steps_in_transcript": 6,
+    "wall_seconds": 9.0
+  },
+  "inputs": [
+    {
+      "name": "member_no",
+      "type": "string",
+      "description": "The member number to look up (e.g. '100101')",
+      "example": "100101"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savings_balance",
+      "type": "money",
+      "shape": "The available balance as a formatted string with comma grouping and two decimal places (e.g. '12,845.50'). No currency symbol.",
+      "description": "The member's primary savings (suffix 0000) available balance"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "click_menu",
+      "ordinal": 1,
+      "intent": "Click the Member Inquiry menu link to open the member search screen",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "MBRINQ",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "type_member_no",
+      "ordinal": 2,
+      "intent": "Type the member number into the search field",
+      "action": "type",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "textbox",
+        "name": "Member Number",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": {
+        "source": "input",
+        "input_name": "member_no",
+        "literal": null,
+        "output_name": null,
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": [
+        {
+          "strategy": "dom_id",
+          "value": "ctl00_MainContent_txtMemberNo",
+          "reason": "ASP.NET WebForms control IDs are unstable across versions and tenant configurations"
+        }
+      ]
+    },
+    {
+      "step_id": "click_search",
+      "ordinal": 3,
+      "intent": "Submit the member search",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "button",
+        "name": "Search",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "click_select",
+      "ordinal": 4,
+      "intent": "Select the member from the search results to open the member record",
+      "action": "click",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax",
+        "frame": {
+          "match": "exact",
+          "value": "main",
+          "role": null,
+          "name_prefix": null
+        },
+        "role": "link",
+        "name": "SEL",
+        "within": null,
+        "table_name": null,
+        "column_header": null,
+        "row_key": null,
+        "row_match": null
+      },
+      "value": null,
+      "wait_for": {
+        "frame": {
+          "match": "role_name",
+          "value": null,
+          "role": "iframe",
+          "name_prefix": "Share accounts for member"
+        },
+        "role": "table",
+        "name": "Share accounts"
+      },
+      "rejected": []
+    },
+    {
+      "step_id": "read_balance",
+      "ordinal": 5,
+      "intent": "Read the available balance from the primary savings row (suffix 0000) in the shares table",
+      "action": "read",
+      "risk": "safe",
+      "target": {
+        "strategy": "ax_relative",
+        "frame": {
+          "match": "role_name",
+          "value": null,
+          "role": "iframe",
+          "name_prefix": "Share accounts for member"
+        },
+        "role": "cell",
+        "name": null,
+        "within": null,
+        "table_name": "Share accounts",
+        "column_header": "AVAILABLE",
+        "row_key": "0000",
+        "row_match": "exact"
+      },
+      "value": {
+        "source": "output",
+        "input_name": null,
+        "literal": null,
+        "output_name": "savings_balance",
+        "review_required": false
+      },
+      "wait_for": null,
+      "rejected": []
+    }
+  ],
+  "known_outcomes": [
+    {
+      "id": "MEMBER_NOT_FOUND",
+      "condition": "Search returns zero results for the given member_no",
+      "business_meaning": "The member number does not exist in the system",
+      "caller_action": "return",
+      "page_text_pattern": "No records found|Member record not found",
+      "at_step": null,
+      "requires_present": null,
+      "requires_absent": null
+    },
+    {
+      "id": "NO_SAVINGS_ACCOUNT",
+      "condition": "Member exists but has no savings share (suffix 0000)",
+      "business_meaning": "The member has no primary savings account",
+      "caller_action": "return",
+      "page_text_pattern": null,
+      "at_step": "read_balance",
+      "requires_present": [
+        {
+          "role": "table",
+          "name": "Share accounts",
+          "frame": {
+            "match": "role_name",
+            "value": null,
+            "role": "iframe",
+            "name_prefix": "Share accounts for member"
+          }
+        }
+      ],
+      "requires_absent": [
+        {
+          "strategy": "ax_relative",
+          "role": null,
+          "name": null,
+          "table_name": "Share accounts",
+          "row_key": "0000"
+        }
+      ]
+    }
+  ],
+  "checkpoint": {
+    "description": "The member's primary savings available balance is visible in the shares table and has been read into savings_balance",
+    "evidence_refs": [
+      "savings_balance"
+    ],
+    "proposed_by": "model"
+  },
+  "recoverables": [
+    {
+      "trigger": "session_expired",
+      "max_retries": 0,
+      "strategy": "escalate",
+      "trigger_pattern": "Your session has expired",
+      "trigger_role": null,
+      "trigger_name": null,
+      "recovery_action": "escalate",
+      "recovery_target_role": null,
+      "recovery_target_name": null
+    },
+    {
+      "trigger": "maintenance_notice",
+      "max_retries": 1,
+      "strategy": "dismiss_and_retry",
+      "trigger_pattern": null,
+      "trigger_role": "dialog",
+      "trigger_name": "Scheduled maintenance",
+      "recovery_action": "dismiss",
+      "recovery_target_role": "link",
+      "recovery_target_name": "Close"
+    },
+    {
+      "trigger": "db_timeout",
+      "max_retries": 1,
+      "strategy": "retry",
+      "trigger_pattern": "Unable to retrieve records",
+      "trigger_role": null,
+      "trigger_name": null,
+      "recovery_action": "retry",
+      "recovery_target_role": null,
+      "recovery_target_name": null
+    }
+  ],
+  "overrides": {
+    "summit": {
+      "steps": {
+        "click_menu": {
+          "target": {
+            "name": {
+              "from_value": "MBRINQ",
+              "to_value": "INQ01"
+            },
+            "column_header": null,
+            "name_prefix": null
+          },
+          "wait_for": {
+            "name": {
+              "from_value": "Member Number",
+              "to_value": "Member ID"
+            }
+          }
+        },
+        "type_member_no": {
+          "target": {
+            "name": {
+              "from_value": "Member Number",
+              "to_value": "Member ID"
+            },
+            "column_header": null,
+            "name_prefix": null
+          },
+          "wait_for": null
+        },
+        "click_search": {
+          "target": null,
+          "wait_for": {
+            "name": {
+              "from_value": "SEL",
+              "to_value": "VIEW"
+            }
+          }
+        },
+        "click_select": {
+          "target": {
+            "name": {
+              "from_value": "SEL",
+              "to_value": "VIEW"
+            },
+            "column_header": null,
+            "name_prefix": null
+          },
+          "wait_for": null
+        },
+        "read_balance": {
+          "target": {
+            "name": null,
+            "column_header": {
+              "from_value": "AVAILABLE",
+              "to_value": "AVAIL BAL"
+            },
+            "name_prefix": null
+          },
+          "wait_for": null
+        }
+      }
+    }
+  },
+  "escalation_policy": {
+    "on_stuck": "Escalate to human operator after 3 retries on the same state",
+    "on_unknown_state": "Escalate immediately with screenshot evidence",
+    "on_blocked": "Return policy_blocked outcome to caller"
+  },
+  "approval": {
+    "status": "approved",
+    "approved_by": "D. PARK",
+    "approved_at": "2026-09-12T03:33:02.125119+00:00",
+    "risk_class": "safe",
+    "content_hash": "sha256:ecf2bd7252a4b03542db49f145000d83c433bb1f2f9559a29b19f3b3abf0c15b"
+  },
+  "meta": {
+    "schema_version": "1.0",
+    "compiler_version": null,
+    "verified_runs": 3
+  }
+}
